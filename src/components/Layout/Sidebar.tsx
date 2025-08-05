@@ -23,12 +23,12 @@ const Sidebar: React.FC = () => {
   };
 
   const navItems = [
-    { to: '/dashboard', icon: Home, label: 'Dashboard', roles: ['Employee', 'Manager', 'HR'] },
-    { to: '/my-requests', icon: FileText, label: 'My Requests', roles: ['Employee', 'Manager', 'HR'] },
-    { to: '/new-request', icon: Calendar, label: 'New Request', roles: ['Employee', 'Manager', 'HR'] },
-    { to: '/pending-approvals', icon: CheckCircle, label: 'Pending Approvals', roles: ['Manager'] },
-    { to: '/hr-approvals', icon: CheckCircle, label: 'HR Approvals', roles: ['HR'] },
-    { to: '/users', icon: Users, label: 'Users', roles: ['HR'] },
+    { to: '/dashboard', icon: Home, label: 'Dashboard', roles: [2,1,0] },
+    { to: '/my-requests', icon: FileText, label: 'My Requests', roles: [2,1,0] },
+    { to: '/new-request', icon: Calendar, label: 'New Request', roles: [2,1,0] },
+    { to: '/pending-approvals', icon: CheckCircle, label: 'Pending Approvals', roles: [1] },
+    { to: '/hr-approvals', icon: CheckCircle, label: 'HR Approvals', roles: [0] },
+    { to: '/users', icon: Users, label: 'Users', roles: [0] },
   ];
 
   const filteredNavItems = navItems.filter(item => 
@@ -40,7 +40,7 @@ const Sidebar: React.FC = () => {
       <div className="p-6">
         <h1 className="text-2xl font-bold text-gray-800">Leave System</h1>
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <p className="text-sm font-medium text-gray-700">{user?.firstName} {user?.lastName}</p>
+          <p className="text-sm font-medium text-gray-700">{user?.username} </p>
           <p className="text-xs text-blue-600">{user?.role}</p>
         </div>
       </div>

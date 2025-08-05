@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await apiService.login(email, password);
+      const response = await apiService.login(username, password);
       login(response.token, response.user);
       toast.success(`Welcome back, ${response.user.firstName}!`);
       navigate(from, { replace: true });
@@ -58,19 +58,19 @@ const Login: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                Username
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
               />
             </div>
             
@@ -137,9 +137,9 @@ const Login: React.FC = () => {
         <div className="bg-blue-50 rounded-lg p-4">
           <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
           <div className="text-xs text-blue-800 space-y-1">
-            <p><strong>Employee:</strong> employee@example.com / password</p>
-            <p><strong>Manager:</strong> manager@example.com / password</p>
-            <p><strong>HR:</strong> hr@example.com / password</p>
+            <p><strong>Employee:</strong> employee / password</p>
+            <p><strong>Manager:</strong> manager / password</p>
+            <p><strong>HR:</strong> hr / password</p>
           </div>
         </div>
       </div>

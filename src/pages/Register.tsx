@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
-    firstName: '',
-    lastName: '',
-    role: 'Employee',
+    name: '',
+    email: '',
+    role: '' as '2' | '1' | '0',
     department: '',
   });
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,9 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await apiService.register(formData);
+      const formData2 = {...formData, role:Number(formData.role) }; // Ensure role is uppercase
+      const response = await apiService.register(formData2);
+      console.log('Role type:', typeof formData2.role, 'Value:', formData2.role);
       login(response.token, response.user);
       toast.success('Account created successfully!');
       navigate('/dashboard');
@@ -53,36 +55,34 @@ const Register: React.FC = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={formData.username}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
             <div>
@@ -126,20 +126,21 @@ const Register: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-                <option value="Employee">Employee</option>
-                <option value="Manager">Manager</option>
-                <option value="HR">HR</option>
+                <option value="2">Employee</option>
+                <option value="1">Manager</option>
+                <option value="0">HR</option>
               </select>
             </div>
 
             <div>
               <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                Department (Optional)
+                Department
               </label>
               <input
                 id="department"
                 name="department"
                 type="text"
+                required
                 value={formData.department}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

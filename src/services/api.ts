@@ -1,15 +1,28 @@
+// src/services/api.ts
+
 import { AuthResponse, User, LeaveRequest, CreateLeaveRequest } from '../types';
 import { mockApiService } from './mockApi';
 
-const API_BASE_URL = 'http://localhost:5173/api'; // Update with your API URL
+const API_BASE_URL = 'http://localhost:5299/api'; // Update with your API URL
 const USE_MOCK_API = false; // Set to false when connecting to real API
 
 class ApiService {
+  // Read token from localStorage and return the Authorization header
   private getAuthHeader(): Record<string, string> {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  // Read and parse the current user object from localStorage
+  private getCurrentUser(): User {
+    const userJson = localStorage.getItem('user');
+    if (!userJson) {
+      throw new Error('No user found in localStorage – please log in first.');
+    }
+    return JSON.parse(userJson) as User;
+  }
+
+  // Common response handler
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'An error occurred' }));
@@ -19,31 +32,30 @@ class ApiService {
   }
 
   // Auth endpoints
-  async login(email: string, password: string): Promise<AuthResponse> {
+
+  async login(username: string, password: string): Promise<AuthResponse> {
     if (USE_MOCK_API) {
-      return mockApiService.login(email, password);
+      return mockApiService.login(username, password);
     }
-    
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     });
     return this.handleResponse<AuthResponse>(response);
   }
 
   async register(userData: {
-    email: string;
+    username: string;
     password: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    department?: string;
+    name: string;
+    email: string;
+    role: 'Employee' | 'Manager' | 'HR';
+    department: string;
   }): Promise<AuthResponse> {
     if (USE_MOCK_API) {
       return mockApiService.register(userData);
     }
-    
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -53,11 +65,11 @@ class ApiService {
   }
 
   // Leave request endpoints
+
   async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
     if (USE_MOCK_API) {
       return mockApiService.createLeaveRequest(data);
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave`, {
       method: 'POST',
       headers: {
@@ -73,10 +85,11 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.getMyLeaveRequests();
     }
-    
-    const response = await fetch(`${API_BASE_URL}/leave/my`, {
-      headers: this.getAuthHeader(),
-    });
+    const user = this.getCurrentUser();
+    const response = await fetch(
+      `${API_BASE_URL}/LeaveRequest/${user.id}`, 
+      { headers: this.getAuthHeader() }
+    );
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
@@ -84,7 +97,6 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.getPendingRequests();
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/pending`, {
       headers: this.getAuthHeader(),
     });
@@ -95,7 +107,6 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.getManagerApprovedRequests();
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/manager-approved`, {
       headers: this.getAuthHeader(),
     });
@@ -103,11 +114,11 @@ class ApiService {
   }
 
   // Manager actions
+
   async managerApprove(id: string): Promise<void> {
     if (USE_MOCK_API) {
       return mockApiService.managerApprove(id);
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/manager/approve/${id}`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -119,7 +130,6 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.managerReject(id);
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/manager/reject/${id}`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -128,11 +138,11 @@ class ApiService {
   }
 
   // HR actions
+
   async hrApprove(id: string): Promise<void> {
     if (USE_MOCK_API) {
       return mockApiService.hrApprove(id);
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/hr/approve/${id}`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -144,7 +154,6 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.hrReject(id);
     }
-    
     const response = await fetch(`${API_BASE_URL}/leave/hr/reject/${id}`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -153,11 +162,11 @@ class ApiService {
   }
 
   // User management
+
   async getUsers(): Promise<User[]> {
     if (USE_MOCK_API) {
       return mockApiService.getUsers();
     }
-    
     const response = await fetch(`${API_BASE_URL}/users`, {
       headers: this.getAuthHeader(),
     });

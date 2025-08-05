@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   role: 'Employee' | 'Manager' | 'HR';
   department?: string;
+  username?: string;
 }
 
 export interface AuthResponse {

@@ -8,7 +8,8 @@ const mockUsers: User[] = [
     firstName: 'John',
     lastName: 'Doe',
     role: 'Employee',
-    department: 'Engineering'
+    department: 'Engineering',
+    username: 'employee'
   },
   {
     id: '2',
@@ -16,7 +17,8 @@ const mockUsers: User[] = [
     firstName: 'Jane',
     lastName: 'Smith',
     role: 'Manager',
-    department: 'Engineering'
+    department: 'Engineering',
+    username: 'manager'
   },
   {
     id: '3',
@@ -24,7 +26,8 @@ const mockUsers: User[] = [
     firstName: 'Alice',
     lastName: 'Johnson',
     role: 'HR',
-    department: 'Human Resources'
+    department: 'Human Resources',
+    username: 'hr'
   },
   {
     id: '4',
@@ -32,7 +35,8 @@ const mockUsers: User[] = [
     firstName: 'Bob',
     lastName: 'Wilson',
     role: 'Employee',
-    department: 'Marketing'
+    department: 'Marketing',
+    username: 'employee2'
   }
 ];
 
@@ -111,14 +115,14 @@ class MockApiService {
     return 'mock-jwt-token-' + Math.random().toString(36).substr(2, 9);
   }
 
-  async login(email: string, password: string): Promise<AuthResponse> {
+  async login(username: string, password: string): Promise<AuthResponse> {
     await this.delay();
     
     if (password !== 'password') {
       throw new Error('Invalid credentials');
     }
 
-    const user = mockUsers.find(u => u.email === email);
+    const user = mockUsers.find(u => u.username === username);
     if (!user) {
       throw new Error('User not found');
     }
@@ -131,12 +135,12 @@ class MockApiService {
   }
 
   async register(userData: {
-    email: string;
+    username: string;
     password: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    department?: string;
+    name: string;
+    email: string;
+    role: 'Employee' | 'Manager' | 'HR';
+    department: string;
   }): Promise<AuthResponse> {
     await this.delay();
 
@@ -148,9 +152,9 @@ class MockApiService {
     const newUser: User = {
       id: (mockUsers.length + 1).toString(),
       email: userData.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      role: userData.role as 'Employee' | 'Manager' | 'HR',
+      firstName: userData.name.split(' ')[0] || userData.name,
+      lastName: userData.name.split(' ').slice(1).join(' ') || '',
+      role: userData.role,
       department: userData.department
     };
 
