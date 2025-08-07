@@ -1,9 +1,8 @@
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: 'Employee' | 'Manager' | 'HR';
+  name : string;
+  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
   department?: string;
   username?: string;
 }
@@ -17,11 +16,11 @@ export interface LeaveRequest {
   id: string;
   employeeId: string;
   employeeName: string;
-  startDate: string;
-  endDate: string;
+  FromDate: string;
+  ToDate: string;
   leaveType: string;
   reason: string;
-  status: 'Pending' | 'ManagerApproved' | 'HRApproved' | 'Rejected' | 'Cancelled';
+  status: 'Pending' | 'Manager_Approved' | 'HR_Approved' | 'Rejected' | 'Cancelled';
   createdAt: string;
   updatedAt: string;
 }

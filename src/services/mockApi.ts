@@ -7,7 +7,7 @@ const mockUsers: User[] = [
     email: 'employee@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    role: 'Employee',
+    role: 'EMPLOYEE',
     department: 'Engineering',
     username: 'employee'
   },
@@ -16,7 +16,7 @@ const mockUsers: User[] = [
     email: 'manager@example.com',
     firstName: 'Jane',
     lastName: 'Smith',
-    role: 'Manager',
+    role: 'MANAGER',
     department: 'Engineering',
     username: 'manager'
   },
@@ -34,7 +34,7 @@ const mockUsers: User[] = [
     email: 'employee2@example.com',
     firstName: 'Bob',
     lastName: 'Wilson',
-    role: 'Employee',
+    role: 'EMPLOYEE',
     department: 'Marketing',
     username: 'employee2'
   }
@@ -61,7 +61,7 @@ const mockLeaveRequests: LeaveRequest[] = [
     endDate: '2024-01-22',
     leaveType: 'Sick Leave',
     reason: 'Medical appointment',
-    status: 'HRApproved',
+    status: 'HR_Approved',
     createdAt: '2024-01-10T09:00:00Z',
     updatedAt: '2024-01-12T14:00:00Z'
   },
@@ -85,7 +85,7 @@ const mockLeaveRequests: LeaveRequest[] = [
     endDate: '2024-03-03',
     leaveType: 'Personal Leave',
     reason: 'Moving to new house',
-    status: 'ManagerApproved',
+    status: 'Manager_Approved',
     createdAt: '2024-01-20T08:00:00Z',
     updatedAt: '2024-01-21T16:00:00Z'
   },
@@ -97,7 +97,7 @@ const mockLeaveRequests: LeaveRequest[] = [
     endDate: '2024-02-12',
     leaveType: 'Annual Leave',
     reason: 'Conference attendance',
-    status: 'HRApproved',
+    status: 'HR_Approved',
     createdAt: '2024-01-05T12:00:00Z',
     updatedAt: '2024-01-08T10:00:00Z'
   }
@@ -203,7 +203,7 @@ class MockApiService {
   async getPendingRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 'Manager') {
+    if (!currentUser || currentUser.role !== 'MANAGER') {
       throw new Error('Access denied');
     }
 
@@ -211,20 +211,20 @@ class MockApiService {
     return mockLeaveRequests.filter(req => req.status === 'Pending');
   }
 
-  async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
+  async getManager_ApprovedRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'HR') {
       throw new Error('Access denied');
     }
 
-    return mockLeaveRequests.filter(req => req.status === 'ManagerApproved');
+    return mockLeaveRequests.filter(req => req.status === 'Manager_Approved');
   }
 
   async managerApprove(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 'Manager') {
+    if (!currentUser || currentUser.role !== 'MANAGER') {
       throw new Error('Access denied');
     }
 
@@ -233,14 +233,14 @@ class MockApiService {
       throw new Error('Request not found');
     }
 
-    request.status = 'ManagerApproved';
+    request.status = 'Manager_Approved';
     request.updatedAt = new Date().toISOString();
   }
 
   async managerReject(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 'Manager') {
+    if (!currentUser || currentUser.role !== 'MANAGER') {
       throw new Error('Access denied');
     }
 
@@ -265,7 +265,7 @@ class MockApiService {
       throw new Error('Request not found');
     }
 
-    request.status = 'HRApproved';
+    request.status = 'HR_Approved';
     request.updatedAt = new Date().toISOString();
   }
 

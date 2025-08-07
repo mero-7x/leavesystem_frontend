@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -14,6 +13,7 @@ import NewRequest from './pages/NewRequest';
 import PendingApprovals from './pages/PendingApprovals';
 import HRApprovals from './pages/HRApprovals';
 import Users from './pages/Users';
+import History from './pages/History';
 
 function App() {
   return (
@@ -37,9 +37,19 @@ function App() {
               }
             />
             <Route
+              path="/history"
+              element={
+                <ProtectedRoute requiredRoles={['MANAGER', 'HR']}>
+                  <Layout>
+                    <History />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/my-requests"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRoles={['Employee']}>
                   <Layout>
                     <MyRequests />
                   </Layout>

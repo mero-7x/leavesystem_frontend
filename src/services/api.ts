@@ -104,9 +104,7 @@ class ApiService {
   }
 
   async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getManagerApprovedRequests();
-    }
+    
     const response = await fetch(`${API_BASE_URL}/leave/manager-approved`, {
       headers: this.getAuthHeader(),
     });
@@ -115,22 +113,20 @@ class ApiService {
 
   // Manager actions
 
-  async managerApprove(id: string): Promise<void> {
+  async managerApprove(leave_id: string): Promise<void> {
     if (USE_MOCK_API) {
-      return mockApiService.managerApprove(id);
+      return mockApiService.managerApprove(leave_id);
     }
-    const response = await fetch(`${API_BASE_URL}/manager/approve/`, {
+    const response = await fetch(`${API_BASE_URL}/manager/${leave_id}/approve`, {
       method: 'POST',
       headers: this.getAuthHeader(),
     });
     await this.handleResponse<void>(response);
   }
 
-  async managerReject(id: string): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.managerReject(id);
-    }
-    const response = await fetch(`${API_BASE_URL}/leave/manager/reject/${id}`, {
+  async managerReject(leave_id: string): Promise<void> {
+   
+    const response = await fetch(`${API_BASE_URL}/manager/${ leave_id}/reject`, {
       method: 'POST',
       headers: this.getAuthHeader(),
     });

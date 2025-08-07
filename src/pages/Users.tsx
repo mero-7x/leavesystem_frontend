@@ -38,8 +38,8 @@ const Users: React.FC = () => {
 
   const roleOptions = [
     { value: 'all', label: 'All Roles' },
-    { value: 'Employee', label: 'Employee' },
-    { value: 'Manager', label: 'Manager' },
+    { value: 'EMPLOYEE ', label: 'Employee' },
+    { value: 'MANAGER', label: 'Manager' },
     { value: 'HR', label: 'HR' },
   ];
 
@@ -136,7 +136,7 @@ const Users: React.FC = () => {
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {user.firstName} {user.lastName}
+                        {user.name} {user.name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -146,7 +146,7 @@ const Users: React.FC = () => {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         user.role === 'HR' 
                           ? 'bg-purple-100 text-purple-800'
-                          : user.role === 'Manager' 
+                          : user.role === 'MANAGER' 
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-green-100 text-green-800'
                       }`}>

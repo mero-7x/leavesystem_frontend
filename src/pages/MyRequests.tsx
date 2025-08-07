@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { apiService } from '../services/api';
 import { LeaveRequest } from '../types';
 import StatusBadge from '../components/UI/StatusBadge';
@@ -34,7 +34,7 @@ const MyRequests: React.FC = () => {
   const statusOptions = [
     { value: 'all', label: 'All Requests' },
     { value: 'Pending', label: 'Pending' },
-    { value: 'ManagerApproved', label: 'Manager Approved' },
+    { value: 'Manager_Approved', label: 'Manager Approved' },
     { value: 'HRApproved', label: 'Approved' },
     { value: 'Rejected', label: 'Rejected' },
     { value: 'Cancelled', label: 'Cancelled' },
