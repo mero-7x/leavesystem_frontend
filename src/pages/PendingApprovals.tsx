@@ -107,7 +107,7 @@ const PendingApprovals: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {format(new Date(request.startDate), 'MMM dd')} - {format(new Date(request.endDate), 'MMM dd, yyyy')}
+                        {/* {format(new Date(request.startDate), 'MMM dd')} - {format(new Date(request.endDate), 'MMM dd, yyyy')} */}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

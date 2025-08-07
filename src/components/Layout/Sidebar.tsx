@@ -23,16 +23,16 @@ const Sidebar: React.FC = () => {
   };
 
   const navItems = [
-    { to: '/dashboard', icon: Home, label: 'Dashboard', roles: [2,1,0] },
-    { to: '/my-requests', icon: FileText, label: 'My Requests', roles: [2,1,0] },
-    { to: '/new-request', icon: Calendar, label: 'New Request', roles: [2,1,0] },
-    { to: '/pending-approvals', icon: CheckCircle, label: 'Pending Approvals', roles: [1] },
-    { to: '/hr-approvals', icon: CheckCircle, label: 'HR Approvals', roles: [0] },
-    { to: '/users', icon: Users, label: 'Users', roles: [0] },
+    { to: '/dashboard', icon: Home, label: 'Dashboard', roles: ["EMPLOYEE","MANAGER","HR"] },
+    { to: '/my-requests', icon: FileText, label: 'My Requests', roles: ['EMPLOYEE',"MANAGER","HR"] },
+    { to: '/new-request', icon: Calendar, label: 'New Request', roles: ["EMPLOYEE","MANAGER","HR"] },
+    { to: '/pending-approvals', icon: CheckCircle, label: 'Pending Approvals', roles: ["MANAGER"] },
+    { to: '/hr-approvals', icon: CheckCircle, label: 'HR Approvals', roles: ["HR"] },
+    { to: '/users', icon: Users, label: 'Users', roles: ["HR"] },
   ];
 
   const filteredNavItems = navItems.filter(item => 
-    user && item.roles.includes(user.role)
+    user && item.roles.includes( user.role)
   );
 
   return (

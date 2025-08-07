@@ -100,7 +100,7 @@ const NewRequest: React.FC = () => {
                 required
                 value={formData.startDate}
                 onChange={handleChange}
-                min={format(new Date(), 'yyyy-MM-dd')}
+                // min={format(new Date(), 'yyyy-MM-dd')}
                 className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>

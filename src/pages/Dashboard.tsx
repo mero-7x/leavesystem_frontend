@@ -93,11 +93,11 @@ const Dashboard: React.FC = () => {
                       <StatusBadge status={request.status} />
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                      {format(new Date(request.startDate), 'MMM dd')} - {format(new Date(request.endDate), 'MMM dd, yyyy')}
+                      {/* {format(new Date(request.startDate), 'MMM dd')} - {format(new Date(request.endDate), 'MMM dd, yyyy')} */}
                     </p>
                   </div>
                   <div className="text-sm text-gray-500">
-                    {format(new Date(request.createdAt), 'MMM dd, yyyy')}
+                    {/* {format(new Date(request.createdAt), 'MMM dd, yyyy')} */}
                   </div>
                 </div>
               ))}

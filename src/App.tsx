@@ -59,7 +59,7 @@ function App() {
             <Route
               path="/pending-approvals"
               element={
-                <ProtectedRoute requiredRoles={['Manager']}>
+                <ProtectedRoute requiredRoles={['MANAGER']}>
                   <Layout>
                     <PendingApprovals />
                   </Layout>

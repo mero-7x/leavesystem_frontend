@@ -29,7 +29,7 @@ const Login: React.FC = () => {
     try {
       const response = await apiService.login(username, password);
       login(response.token, response.user);
-      toast.success(`Welcome back, ${response.user.firstName}!`);
+      toast.success(`Welcome back, ${response.user.username}!`);
       navigate(from, { replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed');

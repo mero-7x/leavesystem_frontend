@@ -11,7 +11,7 @@ const Register: React.FC = () => {
     password: '',
     name: '',
     email: '',
-    role: '' as '2' | '1' | '0',
+    role: 'EMPLOYEE' as 'EMPLOYEE' | 'MANAGER' | 'HR',
     department: '',
   });
   const [loading, setLoading] = useState(false);
@@ -27,9 +27,9 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const formData2 = {...formData, role:Number(formData.role) }; // Ensure role is uppercase
-      const response = await apiService.register(formData2);
-      console.log('Role type:', typeof formData2.role, 'Value:', formData2.role);
+      //const formData2 = {...formData, role:Number(formData.role) }; // Ensure role is uppercase
+      const response = await apiService.register(formData);
+      //console.log('Role type:', typeof formData2.role, 'Value:', formData2.role);
       login(response.token, response.user);
       toast.success('Account created successfully!');
       navigate('/dashboard');
@@ -126,9 +126,9 @@ const Register: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-                <option value="2">Employee</option>
-                <option value="1">Manager</option>
-                <option value="0">HR</option>
+                <option value="EMPLOYEE">Employee</option>
+                <option value="MANAGER">Manager</option>
+                <option value="HR">HR</option>
               </select>
             </div>
 

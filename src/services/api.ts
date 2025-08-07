@@ -50,12 +50,12 @@ class ApiService {
     password: string;
     name: string;
     email: string;
-    role: 'Employee' | 'Manager' | 'HR';
+    role: 'EMPLOYEE' | 'MANAGER' | 'HR';
     department: string;
   }): Promise<AuthResponse> {
-    if (USE_MOCK_API) {
-      return mockApiService.register(userData);
-    }
+    // if (USE_MOCK_API) {
+    //   return mockApiService.register(userData);
+    // }
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -97,7 +97,7 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.getPendingRequests();
     }
-    const response = await fetch(`${API_BASE_URL}/leave/pending`, {
+    const response = await fetch(`${API_BASE_URL}/manager/pending`, {
       headers: this.getAuthHeader(),
     });
     return this.handleResponse<LeaveRequest[]>(response);
@@ -119,7 +119,7 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.managerApprove(id);
     }
-    const response = await fetch(`${API_BASE_URL}/leave/manager/approve/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/manager/approve/`, {
       method: 'POST',
       headers: this.getAuthHeader(),
     });
