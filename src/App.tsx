@@ -49,7 +49,7 @@ function App() {
             <Route
               path="/my-requests"
               element={
-                <ProtectedRoute requiredRoles={['Employee']}>
+                <ProtectedRoute requiredRoles={['EMPLOYEE']}>
                   <Layout>
                     <MyRequests />
                   </Layout>

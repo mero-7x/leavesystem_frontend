@@ -26,8 +26,8 @@ export interface LeaveRequest {
 }
 
 export interface CreateLeaveRequest {
-  startDate: string;
-  endDate: string;
+  fromDate: string;
+  toDate: string;
   leaveType: string;
   reason: string;
 }

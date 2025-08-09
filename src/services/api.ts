@@ -70,7 +70,7 @@ class ApiService {
     if (USE_MOCK_API) {
       return mockApiService.createLeaveRequest(data);
     }
-    const response = await fetch(`${API_BASE_URL}/leave`, {
+    const response = await fetch(`${API_BASE_URL}/LeaveRequest`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -8,8 +8,8 @@ import { format } from 'date-fns';
 
 const NewRequest: React.FC = () => {
   const [formData, setFormData] = useState<CreateLeaveRequest>({
-    startDate: '',
-    endDate: '',
+    fromDate: '',
+    toDate: '',
     leaveType: '',
     reason: '',
   });
@@ -17,13 +17,9 @@ const NewRequest: React.FC = () => {
   const navigate = useNavigate();
 
   const leaveTypes = [
-    'Annual Leave',
-    'Sick Leave',
-    'Personal Leave',
-    'Maternity Leave',
-    'Paternity Leave',
-    'Emergency Leave',
-    'Study Leave',
+    'Annual ',
+    'Sick ',
+    'Temporary '
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -33,7 +29,7 @@ const NewRequest: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+    if (new Date(formData.fromDate) < new Date(formData.toDate)) {
       toast.error('End date must be after start date');
       return;
     }
@@ -98,9 +94,9 @@ const NewRequest: React.FC = () => {
                 name="startDate"
                 type="date"
                 required
-                value={formData.startDate}
+                value={formData.fromDate}
                 onChange={handleChange}
-                // min={format(new Date(), 'yyyy-MM-dd')}
+                min={format(new Date(), 'yyyy-MM-dd')}
                 className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
@@ -114,9 +110,9 @@ const NewRequest: React.FC = () => {
                 name="endDate"
                 type="date"
                 required
-                value={formData.endDate}
+                value={formData.toDate}
                 onChange={handleChange}
-                min={formData.startDate || format(new Date(), 'yyyy-MM-dd')}
+                min={formData.toDate || format(new Date(), 'yyyy-MM-dd')}
                 className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
