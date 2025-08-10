@@ -15,14 +15,15 @@ export interface AuthResponse {
 export interface LeaveRequest {
   id: string;
   employeeId: string;
-  employeeName: string;
-  FromDate: string;
-  ToDate: string;
+  name: string;
+  fromDate: string;
+  toDate: string;
   leaveType: string;
   reason: string;
   status: 'Pending' | 'Manager_Approved' | 'HR_Approved' | 'Rejected' | 'Cancelled';
   createdAt: string;
   updatedAt: string;
+  userName: string;
 }
 
 export interface CreateLeaveRequest {

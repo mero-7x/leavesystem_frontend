@@ -29,7 +29,7 @@ const NewRequest: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (new Date(formData.fromDate) < new Date(formData.toDate)) {
+    if (new Date(formData.fromDate) > new Date(formData.toDate)) {
       toast.error('End date must be after start date');
       return;
     }
@@ -91,7 +91,7 @@ const NewRequest: React.FC = () => {
               </label>
               <input
                 id="startDate"
-                name="startDate"
+                name="fromDate"
                 type="date"
                 required
                 value={formData.fromDate}
@@ -107,7 +107,7 @@ const NewRequest: React.FC = () => {
               </label>
               <input
                 id="endDate"
-                name="endDate"
+                name="toDate"
                 type="date"
                 required
                 value={formData.toDate}

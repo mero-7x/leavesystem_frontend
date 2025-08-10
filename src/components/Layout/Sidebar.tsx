@@ -113,11 +113,11 @@ const Sidebar: React.FC = () => {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
               <span className="text-sm font-semibold">
-                {user.username}
+                {user.name}
               </span>
             </div>
             <div>
-              <p className="font-semibold text-sm">{user.username} </p>
+              <p className="font-semibold text-sm">{user.name} </p>
               <p className="text-xs opacity-90">{user.department}</p>
             </div>
           </div>

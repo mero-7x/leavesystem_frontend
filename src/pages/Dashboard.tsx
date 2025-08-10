@@ -5,7 +5,7 @@ import { apiService } from '../services/api';
 import { LeaveRequest } from '../types';
 import StatusBadge from '../components/UI/StatusBadge';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
-// import { format } from 'date-fns';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -76,25 +76,25 @@ const Dashboard: React.FC = () => {
     switch (user?.role) {
       case 'EMPLOYEE':
         return {
-          title: `Welcome back, ${user?.username}!`,
+          title: `Welcome back, ${user?.name}!`,
           subtitle: 'Manage your leave requests and track their status',
           color: 'from-green-500 to-emerald-600'
         };
       case 'MANAGER':
         return {
-          title: `Good day, ${user?.username}!`,
+          title: `Good day, ${user?.name}!`,
           subtitle: 'Review team requests and manage your own leave',
           color: 'from-blue-500 to-indigo-600'
         };
       case 'HR':
         return {
-          title: `Hello, ${user?.username}!`,
+          title: `Hello, ${user?.name}!`,
           subtitle: 'Oversee all leave requests and manage system users',
           color: 'from-purple-500 to-violet-600'
         };
       default:
         return {
-          title: `Welcome, ${user?.username}!`,
+          title: `Welcome, ${user?.name}!`,
           subtitle: 'Your dashboard overview',
           color: 'from-gray-500 to-gray-600'
         };
@@ -124,7 +124,7 @@ const Dashboard: React.FC = () => {
           <div className="hidden md:block">
             <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
               <span className="text-3xl font-bold">
-                {user?.username }
+                {user?.name }
               </span>
             </div>
           </div>
@@ -168,13 +168,13 @@ const Dashboard: React.FC = () => {
                 <div key={request.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-100">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
-                      <h3 className="font-semibold text-gray-900">{request.employeeName}</h3>
+                      <h3 className="font-semibold text-gray-900">{request.name}</h3>
                       <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
                         {request.leaveType}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      {/* {format(new Date(request.startDate), 'MMM dd')} - {format(new Date(request.endDate), 'MMM dd, yyyy')} */}
+                      {/* {format(new Date(request.FromDate), 'MMM dd')} - {format(new Date(request.ToDate), 'MMM dd, yyyy')} */}
                     </p>
                   </div>
                   <div className="text-sm text-gray-500">
@@ -203,7 +203,7 @@ const Dashboard: React.FC = () => {
                 <div key={request.id} className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-100">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
-                      <h3 className="font-semibold text-gray-900">{request.employeeName}</h3>
+                      <h3 className="font-semibold text-gray-900">{request.name}</h3>
                       <span className="text-sm text-red-600 bg-red-100 px-2 py-1 rounded-full">
                         {request.leaveType}
                       </span>
