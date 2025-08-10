@@ -66,6 +66,22 @@ class ApiService {
 
   // Leave request endpoints
 
+// src/services/api.ts
+async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
+  // if (USE_MOCK_API) {
+  //   return mockApiService.getManagerApprovedRequests();
+  // }
+
+  const response = await fetch(`${API_BASE_URL}/Manager/approved`, {
+    headers: this.getAuthHeader(),
+  });
+  return this.handleResponse<LeaveRequest[]>(response);
+}
+
+
+
+
+
   async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
     if (USE_MOCK_API) {
       return mockApiService.createLeaveRequest(data);
@@ -93,6 +109,8 @@ class ApiService {
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
+  
+
   async getPendingRequests(): Promise<LeaveRequest[]> {
     if (USE_MOCK_API) {
       return mockApiService.getPendingRequests();
@@ -103,13 +121,13 @@ class ApiService {
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
-  async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
+  // async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
     
-    const response = await fetch(`${API_BASE_URL}/leave/manager-approved`, {
-      headers: this.getAuthHeader(),
-    });
-    return this.handleResponse<LeaveRequest[]>(response);
-  }
+  //   const response = await fetch(`${API_BASE_URL}/leave/manager-approved`, {
+  //     headers: this.getAuthHeader(),
+  //   });
+  //   return this.handleResponse<LeaveRequest[]>(response);
+  // }
 
   // Manager actions
 

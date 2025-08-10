@@ -27,6 +27,14 @@ const PendingApprovals: React.FC = () => {
     }
   };
 
+  // ⬇️ helper goes here (module scope)
+const fmtYMD = (v: string | Date | null | undefined) => {
+  if (!v) return '';
+  if (typeof v === 'string') return v.split('T')[0]; // handles "YYYY-MM-DDTHH:mm:ss"
+  return v.toISOString().slice(0, 10);
+};
+
+
   const handleApprove = async (id: string) => {
     setActionLoading(id);
     try {
@@ -117,10 +125,10 @@ const PendingApprovals: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{request.fromDate}</div>
+                      <div className="text-sm text-gray-900">{fmtYMD(request.fromDate)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{request.toDate}</div>
+                      <div className="text-sm text-gray-900">{fmtYMD(request.toDate)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={request.status} />

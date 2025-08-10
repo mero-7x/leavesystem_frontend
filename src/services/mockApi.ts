@@ -218,7 +218,7 @@ class MockApiService {
       throw new Error('Access denied');
     }
 
-    return mockLeaveRequests.filter(req => req.status === 'Manager_Approved');
+    return mockLeaveRequests.filter( req => req.status === 'Manager_Approved' || req.status === 'HR_Approved');
   }
 
   async managerApprove(id: string): Promise<void> {

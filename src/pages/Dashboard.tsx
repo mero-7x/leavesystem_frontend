@@ -5,7 +5,7 @@ import { apiService } from '../services/api';
 import { LeaveRequest } from '../types';
 import StatusBadge from '../components/UI/StatusBadge';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
         return [
           { title: 'Total Requests', value: myRequests.length, icon: FileText, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50' },
           { title: 'Pending', value: getStatusCount('Pending'), icon: Clock, color: 'from-yellow-500 to-yellow-600', bgColor: 'bg-yellow-50' },
-          { title: 'Approved', value: getStatusCount('HRApproved'), icon: CheckCircle, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50' },
+          { title: 'Approved', value: getStatusCount('HR_Approved'), icon: CheckCircle, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50' },
           { title: 'This Month', value: myRequests.filter(req => new Date(req.createdAt).getMonth() === new Date().getMonth()).length, icon: Calendar, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50' },
         ];
       case 'MANAGER':
