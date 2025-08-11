@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
           { title: 'My Requests', value: myRequests.length, icon: FileText, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50' },
           { title: 'Awaiting Final', value: hrRequests.length, icon: AlertCircle, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50' },
           { title: 'Total Processed', value: hrRequests.length + 15, icon: Award, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50' },
-          { title: 'System Users', value: 12, icon: Users, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50' },
+          { title: 'System Users', value: 10, icon: Users, color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50' },
         ];
       default:
         return [];

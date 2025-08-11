@@ -1,6 +1,6 @@
 // src/services/api.ts
 
-import { AuthResponse, User, LeaveRequest, CreateLeaveRequest } from '../types';
+import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse } from '../types';
 import { mockApiService } from './mockApi';
 
 const API_BASE_URL = 'http://localhost:5299/api'; // Update with your API URL
@@ -77,9 +77,17 @@ async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
   });
   return this.handleResponse<LeaveRequest[]>(response);
 }
-
-
-
+ // ✅ Added auth header here
+  async getHRPending(): Promise<ManagerApprovedResponse> {
+    const response = await fetch(`${API_BASE_URL}/HR/pending`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeader(),
+      },
+    });
+    return this.handleResponse<ManagerApprovedResponse>(response);
+  }
 
 
   async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
@@ -152,12 +160,14 @@ async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
   }
 
   // HR actions
+  
+
 
   async hrApprove(id: string): Promise<void> {
     if (USE_MOCK_API) {
       return mockApiService.hrApprove(id);
     }
-    const response = await fetch(`${API_BASE_URL}/leave/hr/approve/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/hr/approve/${id}`, {
       method: 'POST',
       headers: this.getAuthHeader(),
     });
