@@ -67,6 +67,7 @@ class ApiService {
   // Leave request endpoints
 
 // src/services/api.ts
+
 async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
   // if (USE_MOCK_API) {
   //   return mockApiService.getManagerApprovedRequests();
@@ -163,27 +164,34 @@ async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
   
 
 
-  async hrApprove(id: string): Promise<void> {
+  async hrReject(leave_id: string, reason: string = "Rejected by HR"): Promise<void> {
     if (USE_MOCK_API) {
-      return mockApiService.hrApprove(id);
+      return mockApiService.hrReject(leave_id);
     }
-    const response = await fetch(`${API_BASE_URL}/hr/approve/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/HR/${leave_id}/reject`, {
       method: 'POST',
-      headers: this.getAuthHeader(),
+      headers: {
+        'Content-Type': 'application/json',  // ✅ Add Content-Type
+        ...this.getAuthHeader(),
+      },
+      body: JSON.stringify({ reason: reason })  // ✅ Add body with reason
     });
     await this.handleResponse<void>(response);
-  }
+}
 
-  async hrReject(id: string): Promise<void> {
+async hrApprove(leave_id: string): Promise<void> {
     if (USE_MOCK_API) {
-      return mockApiService.hrReject(id);
+      return mockApiService.hrApprove(leave_id);
     }
-    const response = await fetch(`${API_BASE_URL}/leave/hr/reject/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/HR/${leave_id}/approve`, {
       method: 'POST',
-      headers: this.getAuthHeader(),
+      headers: {
+        'Content-Type': 'application/json',  // ✅ Add Content-Type for consistency
+        ...this.getAuthHeader(),
+      }
     });
     await this.handleResponse<void>(response);
-  }
+}
 
   // User management
 

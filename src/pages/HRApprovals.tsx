@@ -30,10 +30,10 @@ const HRApprovals: React.FC = () => {
     }
   };
 
-  const handleApprove = async (id: number) => {
-    setActionLoading(id);
+  const handleApprove = async (leave_id: number) => {
+    setActionLoading(leave_id);
     try {
-      await apiService.hrApprove(String(id)); // service expects string id
+      await apiService.hrApprove(String(leave_id)); // service expects string id
       toast.success('Request approved successfully');
       await fetchHrPending();
     } catch (error) {
@@ -44,10 +44,10 @@ const HRApprovals: React.FC = () => {
     }
   };
 
-  const handleReject = async (id: number) => {
-    setActionLoading(id);
+  const handleReject = async (leave_id: number) => {
+    setActionLoading(leave_id);
     try {
-      await apiService.hrReject(String(id));
+      await apiService.hrReject(String(leave_id));
       toast.success('Request rejected');
       await fetchHrPending();
     } catch (error) {

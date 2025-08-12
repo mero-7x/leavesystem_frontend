@@ -7,6 +7,7 @@ import { LeaveRequest } from '../types';
 import StatusBadge from '../components/UI/StatusBadge';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import toast from 'react-hot-toast';
+import type { ManagerApprovedItem } from '../types';
 
 const fmtYMD = (v: string | Date | null | undefined) => {
   if (!v) return '';
@@ -19,18 +20,58 @@ const History: React.FC = () => {
   const [rows, setRows] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await apiService.getManagerApprovedRequests();
-        setRows(data); // already manager-approved
-      } catch {
-        toast.error('Failed to load manager-approved requests');
-      } finally {
-        setLoading(false);
+const raw = localStorage.getItem('user');
+const role = raw ? (JSON.parse(raw)?.role as 'HR' | 'MANAGER' | 'EMPLOYEE' | undefined) : undefined;
+
+const getRoleFromLocalStorage = (): 'HR' | 'MANAGER' | 'EMPLOYEE' | null => {
+  const raw = localStorage.getItem('user');
+  if (!raw) return null;
+  try {
+    const obj = JSON.parse(raw) as { role?: string };
+    if (obj.role === 'HR' || obj.role === 'MANAGER' || obj.role === 'EMPLOYEE') {
+      return obj.role;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+const mapManagerApprovedToLeave = (i: ManagerApprovedItem): LeaveRequest => ({
+  id: String(i.id),
+  employeeId: String(i.userId),
+  name: i.userName,
+  fromDate: i.fromDate,
+  toDate: i.toDate,
+  leaveType: i.leaveType,
+  reason: i.reason,
+  // your LeaveRequest.status union uses 'Manager_Approved' (capital A)
+  status: i.status === 'Manager_Approved' ? 'Manager_Approved' : (i.status as any),
+  createdAt: i.createdAt,
+  updatedAt: i.createdAt, // backend didn’t send updatedAt, reuse createdAt
+  userName: i.userName,
+});
+useEffect(() => {
+  (async () => {
+    try {
+      const role = getRoleFromLocalStorage();
+
+      if (role === 'HR') {
+        const res = await apiService.getHRPending(); // { success, count, data: ManagerApprovedItem[] }
+        setRows(res.data.map(mapManagerApprovedToLeave));
+        
+      } else if (role === 'MANAGER') {
+        const data = await apiService.getManagerApprovedRequests(); // LeaveRequest[]
+        setRows(data);
+      } else {
+        setRows([]); // EMPLOYEE or unknown: nothing to show here
       }
-    })();
-  }, []);
+    } catch {
+      toast.error('Failed to load manager-approved requests');
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
 
   if (loading) return <LoadingSpinner />;
 
