@@ -1,42 +1,56 @@
 import { AuthResponse, User, LeaveRequest, CreateLeaveRequest } from '../types';
 
-// Mock data
+// Enhanced mock data with more realistic information
 const mockUsers: User[] = [
   {
     id: '1',
-    email: 'employee@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
+    email: 'employee@company.com',
+    firstName: 'أحمد',
+    lastName: 'محمد',
+    name: 'أحمد محمد',
     role: 'EMPLOYEE',
-    department: 'Engineering',
+    department: 'تطوير البرمجيات',
     username: 'employee'
   },
   {
     id: '2',
-    email: 'manager@example.com',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    role: 'MANAGER',
-    department: 'Engineering',
+    email: 'manager@company.com',
+    firstName: 'سارة',
+    lastName: 'أحمد',
+    name: 'سارة أحمد',
+    role: ' MANAGER',
+    department: 'تطوير البرمجيات',
     username: 'manager'
   },
   {
     id: '3',
-    email: 'hr@example.com',
-    firstName: 'Alice',
-    lastName: 'Johnson',
+    email: 'hr@company.com',
+    firstName: 'محمد',
+    lastName: 'علي',
+    name: 'محمد علي',
     role: 'HR',
-    department: 'Human Resources',
+    department: 'الموارد البشرية',
     username: 'hr'
   },
   {
     id: '4',
-    email: 'employee2@example.com',
-    firstName: 'Bob',
-    lastName: 'Wilson',
+    email: 'employee2@company.com',
+    firstName: 'فاطمة',
+    lastName: 'حسن',
+    name: 'فاطمة حسن',
     role: 'EMPLOYEE',
-    department: 'Marketing',
+    department: 'التسويق',
     username: 'employee2'
+  },
+  {
+    id: '5',
+    email: 'employee3@company.com',
+    firstName: 'خالد',
+    lastName: 'عبدالله',
+    name: 'خالد عبدالله',
+    role: 'EMPLOYEE',
+    department: 'المبيعات',
+    username: 'employee3'
   }
 ];
 
@@ -44,11 +58,14 @@ const mockLeaveRequests: LeaveRequest[] = [
   {
     id: '1',
     employeeId: '1',
-    employeeName: 'John Doe',
+    employeeName: 'أحمد محمد',
+    name: 'أحمد محمد',
     startDate: '2024-02-15',
     endDate: '2024-02-17',
-    leaveType: 'Annual Leave',
-    reason: 'Family vacation',
+    fromDate: '2024-02-15',
+    toDate: '2024-02-17',
+    leaveType: 'إجازة سنوية',
+    reason: 'إجازة عائلية',
     status: 'Pending',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z'
@@ -56,11 +73,14 @@ const mockLeaveRequests: LeaveRequest[] = [
   {
     id: '2',
     employeeId: '1',
-    employeeName: 'John Doe',
+    employeeName: 'أحمد محمد',
+    name: 'أحمد محمد',
     startDate: '2024-01-20',
     endDate: '2024-01-22',
-    leaveType: 'Sick Leave',
-    reason: 'Medical appointment',
+    fromDate: '2024-01-20',
+    toDate: '2024-01-22',
+    leaveType: 'إجازة مرضية',
+    reason: 'موعد طبي',
     status: 'HR_Approved',
     createdAt: '2024-01-10T09:00:00Z',
     updatedAt: '2024-01-12T14:00:00Z'
@@ -68,11 +88,14 @@ const mockLeaveRequests: LeaveRequest[] = [
   {
     id: '3',
     employeeId: '4',
-    employeeName: 'Bob Wilson',
+    employeeName: 'فاطمة حسن',
+    name: 'فاطمة حسن',
     startDate: '2024-02-20',
     endDate: '2024-02-25',
-    leaveType: 'Annual Leave',
-    reason: 'Wedding anniversary celebration',
+    fromDate: '2024-02-20',
+    toDate: '2024-02-25',
+    leaveType: 'إجازة سنوية',
+    reason: 'احتفال بذكرى الزواج',
     status: 'Pending',
     createdAt: '2024-01-18T11:00:00Z',
     updatedAt: '2024-01-18T11:00:00Z'
@@ -80,11 +103,14 @@ const mockLeaveRequests: LeaveRequest[] = [
   {
     id: '4',
     employeeId: '4',
-    employeeName: 'Bob Wilson',
+    employeeName: 'فاطمة حسن',
+    name: 'فاطمة حسن',
     startDate: '2024-03-01',
     endDate: '2024-03-03',
-    leaveType: 'Personal Leave',
-    reason: 'Moving to new house',
+    fromDate: '2024-03-01',
+    toDate: '2024-03-03',
+    leaveType: 'إجازة شخصية',
+    reason: 'الانتقال إلى منزل جديد',
     status: 'Manager_Approved',
     createdAt: '2024-01-20T08:00:00Z',
     updatedAt: '2024-01-21T16:00:00Z'
@@ -92,39 +118,78 @@ const mockLeaveRequests: LeaveRequest[] = [
   {
     id: '5',
     employeeId: '2',
-    employeeName: 'Jane Smith',
+    employeeName: 'سارة أحمد',
+    name: 'سارة أحمد',
     startDate: '2024-02-10',
     endDate: '2024-02-12',
-    leaveType: 'Annual Leave',
-    reason: 'Conference attendance',
+    fromDate: '2024-02-10',
+    toDate: '2024-02-12',
+    leaveType: 'إجازة سنوية',
+    reason: 'حضور مؤتمر',
     status: 'HR_Approved',
     createdAt: '2024-01-05T12:00:00Z',
     updatedAt: '2024-01-08T10:00:00Z'
+  },
+  {
+    id: '6',
+    employeeId: '5',
+    employeeName: 'خالد عبدالله',
+    name: 'خالد عبدالله',
+    startDate: '2024-02-28',
+    endDate: '2024-03-02',
+    fromDate: '2024-02-28',
+    toDate: '2024-03-02',
+    leaveType: 'إجازة طارئة',
+    reason: 'ظروف عائلية طارئة',
+    status: 'Rejected',
+    createdAt: '2024-01-25T14:00:00Z',
+    updatedAt: '2024-01-26T09:00:00Z',
+    rejectionReason: 'تعارض مع مواعيد مهمة في المشروع'
   }
 ];
 
 let currentUser: User | null = null;
 let authToken: string | null = null;
 
+/**
+ * Mock API Service for development and testing
+ * Simulates backend API responses with realistic data
+ */
 class MockApiService {
-  private delay(ms: number = 500) {
+  /**
+   * Simulate network delay
+   * @param ms - Milliseconds to delay
+   */
+  private delay(ms: number = 800) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  /**
+   * Generate mock JWT token
+   * @returns Mock token string
+   */
   private generateToken(): string {
     return 'mock-jwt-token-' + Math.random().toString(36).substr(2, 9);
   }
 
+  // ==================== AUTH METHODS ====================
+
+  /**
+   * Mock user login
+   * @param username - Username or email
+   * @param password - User password
+   * @returns Authentication response
+   */
   async login(username: string, password: string): Promise<AuthResponse> {
     await this.delay();
     
     if (password !== 'password') {
-      throw new Error('Invalid credentials');
+      throw new Error('كلمة المرور غير صحيحة');
     }
 
-    const user = mockUsers.find(u => u.username === username);
+    const user = mockUsers.find(u => u.username === username || u.email === username);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('المستخدم غير موجود');
     }
 
     const token = this.generateToken();
@@ -134,28 +199,36 @@ class MockApiService {
     return { token, user };
   }
 
+  /**
+   * Mock user registration
+   * @param userData - User registration data
+   * @returns Authentication response
+   */
   async register(userData: {
     username: string;
     password: string;
     name: string;
     email: string;
-    role: 'Employee' | 'Manager' | 'HR';
+    role: 'EMPLOYEE' | 'MANAGER' | 'HR';
     department: string;
   }): Promise<AuthResponse> {
     await this.delay();
 
     // Check if user already exists
     if (mockUsers.find(u => u.email === userData.email)) {
-      throw new Error('User already exists');
+      throw new Error('المستخدم موجود بالفعل');
     }
 
+    const nameParts = userData.name.split(' ');
     const newUser: User = {
       id: (mockUsers.length + 1).toString(),
       email: userData.email,
-      firstName: userData.name.split(' ')[0] || userData.name,
-      lastName: userData.name.split(' ').slice(1).join(' ') || '',
+      firstName: nameParts[0] || userData.name,
+      lastName: nameParts.slice(1).join(' ') || '',
+      name: userData.name,
       role: userData.role,
-      department: userData.department
+      department: userData.department,
+      username: userData.username
     };
 
     mockUsers.push(newUser);
@@ -166,19 +239,29 @@ class MockApiService {
     return { token, user: newUser };
   }
 
+  // ==================== LEAVE REQUEST METHODS ====================
+
+  /**
+   * Create new leave request
+   * @param data - Leave request data
+   * @returns Created leave request
+   */
   async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
     await this.delay();
 
     if (!currentUser) {
-      throw new Error('Not authenticated');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     const newRequest: LeaveRequest = {
       id: (mockLeaveRequests.length + 1).toString(),
       employeeId: currentUser.id,
       employeeName: `${currentUser.firstName} ${currentUser.lastName}`,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      name: currentUser.name || `${currentUser.firstName} ${currentUser.lastName}`,
+      startDate: data.startDate || data.fromDate || '',
+      endDate: data.endDate || data.toDate || '',
+      fromDate: data.fromDate || data.startDate || '',
+      toDate: data.toDate || data.endDate || '',
       leaveType: data.leaveType,
       reason: data.reason,
       status: 'Pending',
@@ -190,106 +273,183 @@ class MockApiService {
     return newRequest;
   }
 
+  /**
+   * Get current user's leave requests
+   * @returns Array of user's leave requests
+   */
   async getMyLeaveRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
     if (!currentUser) {
-      throw new Error('Not authenticated');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     return mockLeaveRequests.filter(req => req.employeeId === currentUser!.id);
   }
 
+  /**
+   * Get pending requests for manager approval
+   * @returns Array of pending requests
+   */
   async getPendingRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'MANAGER') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
-    // For demo purposes, show all pending requests
     return mockLeaveRequests.filter(req => req.status === 'Pending');
   }
 
-  async getManager_ApprovedRequests(): Promise<LeaveRequest[]> {
+  /**
+   * Get manager approved requests for HR
+   * @returns Array of manager approved requests
+   */
+  async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'HR') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
-    return mockLeaveRequests.filter( req => req.status === 'Manager_Approved' || req.status === 'HR_Approved');
+    return mockLeaveRequests.filter(req => req.status === 'Manager_Approved');
   }
 
+  // ==================== MANAGER ACTIONS ====================
+
+  /**
+   * Manager approve leave request
+   * @param id - Leave request ID
+   */
   async managerApprove(id: string): Promise<void> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'MANAGER') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     const request = mockLeaveRequests.find(req => req.id === id);
     if (!request) {
-      throw new Error('Request not found');
+      throw new Error('الطلب غير موجود');
     }
 
     request.status = 'Manager_Approved';
     request.updatedAt = new Date().toISOString();
   }
 
+  /**
+   * Manager reject leave request
+   * @param id - Leave request ID
+   */
   async managerReject(id: string): Promise<void> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'MANAGER') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     const request = mockLeaveRequests.find(req => req.id === id);
     if (!request) {
-      throw new Error('Request not found');
+      throw new Error('الطلب غير موجود');
     }
 
     request.status = 'Rejected';
     request.updatedAt = new Date().toISOString();
   }
 
-  async hrApprove(id: string): Promise<void> {
+  /**
+   * Manager cancel leave request
+   * @param id - Leave request ID
+   */
+  async managerCancel(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 'HR') {
-      throw new Error('Access denied');
+    if (!currentUser || currentUser.role !== 'MANAGER') {
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     const request = mockLeaveRequests.find(req => req.id === id);
     if (!request) {
-      throw new Error('Request not found');
+      throw new Error('الطلب غير موجود');
+    }
+
+    request.status = 'Cancelled';
+    request.updatedAt = new Date().toISOString();
+  }
+
+  // ==================== HR ACTIONS ====================
+
+  /**
+   * HR approve leave request (final approval)
+   * @param id - Leave request ID
+   */
+  async hrApprove(id: string): Promise<void> {
+    await this.delay();
+
+    if (!currentUser || currentUser.role !== 'HR') {
+      throw new Error('غير مصرح لك بالوصول');
+    }
+
+    const request = mockLeaveRequests.find(req => req.id === id);
+    if (!request) {
+      throw new Error('الطلب غير موجود');
     }
 
     request.status = 'HR_Approved';
     request.updatedAt = new Date().toISOString();
   }
 
+  /**
+   * HR reject leave request
+   * @param id - Leave request ID
+   */
   async hrReject(id: string): Promise<void> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'HR') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     const request = mockLeaveRequests.find(req => req.id === id);
     if (!request) {
-      throw new Error('Request not found');
+      throw new Error('الطلب غير موجود');
     }
 
     request.status = 'Rejected';
     request.updatedAt = new Date().toISOString();
   }
 
+  /**
+   * HR cancel leave request
+   * @param id - Leave request ID
+   */
+  async hrCancel(id: string): Promise<void> {
+    await this.delay();
+
+    if (!currentUser || currentUser.role !== 'HR') {
+      throw new Error('غير مصرح لك بالوصول');
+    }
+
+    const request = mockLeaveRequests.find(req => req.id === id);
+    if (!request) {
+      throw new Error('الطلب غير موجود');
+    }
+
+    request.status = 'Cancelled';
+    request.updatedAt = new Date().toISOString();
+  }
+
+  // ==================== USER MANAGEMENT ====================
+
+  /**
+   * Get all system users (HR only)
+   * @returns Array of all users
+   */
   async getUsers(): Promise<User[]> {
     await this.delay();
 
     if (!currentUser || currentUser.role !== 'HR') {
-      throw new Error('Access denied');
+      throw new Error('غير مصرح لك بالوصول');
     }
 
     return mockUsers;

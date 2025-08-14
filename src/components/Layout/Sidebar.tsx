@@ -78,14 +78,14 @@ const Sidebar: React.FC = () => {
       case 'MANAGER':
         return [
           ...baseItems,
-          { to: '/new-request', icon: Calendar, label: 'New Request' },
+          // { to: '/new-request', icon: Calendar, label: 'New Request' },
           { to: '/pending-approvals', icon: Clock, label: 'Team Approvals' },
           { to: '/history', icon: FileText, label: 'Approval History' }
         ];
       case 'HR':
         return [
           ...baseItems,
-          { to: '/new-request', icon: Calendar, label: 'New Request' },
+          // { to: '/new-request', icon: Calendar, label: 'New Request' },
           { to: '/hr-approvals', icon: CheckCircle, label: 'Final Approvals' },
           { to: '/history', icon: FileText, label: 'Approval History' },
           { to: '/users', icon: Users, label: 'User Management' }
@@ -156,7 +156,7 @@ const Sidebar: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-gray-600">
-            {user.role === 'EMPLOYEE' && 'Submit and track your leave requests'}
+            {user.role ===  'EMPLOYEE' && 'Submit and track your leave requests'}
             {user.role === 'MANAGER' && 'Approve team leave requests'}
             {user.role === 'HR' && 'Manage users and final approvals'}
           </p>

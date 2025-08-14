@@ -1,11 +1,13 @@
 // ---------- Auth / User ----------
 export interface User {
-  id: string; // if your backend sends a number, string is still fine for URLs; otherwise change to number
+  id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: 'EMPLOYEE' | 'MANAGER' | 'HR';
   department?: string;
   username?: string;
+  name?: string;
 }
 
 export interface AuthResponse {
@@ -13,27 +15,30 @@ export interface AuthResponse {
   user: User;
 }
 
-// ---------- App-wide Leave model (your existing one) ----------
+// ---------- App-wide Leave model ----------
 export type LeaveStatus =
   | 'Pending'
   | 'Manager_Approved'
-  | 'Manager_approved'   // backend sometimes sends this exact casing
   | 'HR_Approved'
   | 'Rejected'
   | 'Cancelled';
 
 export interface LeaveRequest {
-  id: string;            // if you want to accept numbers too: string | number
-  employeeId: string;    // same note: string | number if needed
-  name: string;
-  fromDate: string;      // "YYYY-MM-DDTHH:mm:ss" or "YYYY-MM-DD"
-  toDate: string;
+  id: string;
+  employeeId: string;
+  employeeName?: string;
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  fromDate?: string;
+  toDate?: string;
   leaveType: string;
   reason: string;
   status: LeaveStatus;
   createdAt: string;
   updatedAt: string;
-  userName: string;
+  userName?: string;
+  rejectionReason?: string;
 }
 
 // ---------- Generic API envelope ----------
@@ -43,29 +48,36 @@ export type ApiListResponse<T> = {
   data: T[];
 };
 
-// ---------- Exact row shape for HR/ pending & Manager/ approved ----------
+// ---------- Manager Approved Item ----------
 export type ManagerApprovedStatus = 'Manager_Approved';
 
 export interface ManagerApprovedItem {
   id: number;
   userId: number;
-  userName: string;      // backend sends empty string sometimes, still string
-  fromDate: string;      // "YYYY-MM-DDTHH:mm:ss"
-  toDate: string;        // "YYYY-MM-DDTHH:mm:ss"
+  userName: string;
+  fromDate: string;
+  toDate: string;
   leaveType: 'Sick' | 'Annual' | 'Temporary' | string;
   reason: string;
   status: ManagerApprovedStatus;
-  createdAt: string;     // "YYYY-MM-DD HH:mm:ss"
+  createdAt: string;
+  rejectionReason?: string;
 }
 
-// Envelope for HR/pending (and Manager/approved if it uses the same shape)
 export type ManagerApprovedResponse = ApiListResponse<ManagerApprovedItem>;
 
 // ---------- Create payload ----------
 export interface CreateLeaveRequest {
-  fromDate: string;
-  toDate: string;
+  startDate?: string;
+  endDate?: string;
+  fromDate?: string;
+  toDate?: string;
   leaveType: string;
+  reason: string;
+}
+
+// ---------- Rejection payload ----------
+export interface RejectionRequest {
   reason: string;
 }
 

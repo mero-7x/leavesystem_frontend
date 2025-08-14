@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -15,17 +16,21 @@ import HRApprovals from './pages/HRApprovals';
 import Users from './pages/Users';
 import History from './pages/History';
 
+/**
+ * Main App Component
+ * Handles routing, authentication, and global layout
+ */
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
           <Routes>
-            {/* Public routes */}
+            {/* Public routes - accessible without authentication */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Protected routes */}
+            {/* Protected routes - require authentication */}
             <Route
               path="/dashboard"
               element={
@@ -36,16 +41,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/history"
-              element={
-                <ProtectedRoute requiredRoles={['MANAGER', 'HR']}>
-                  <Layout>
-                    <History />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
+            
+            {/* Employee-only routes */}
             <Route
               path="/my-requests"
               element={
@@ -56,6 +53,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
+            {/* All authenticated users can create requests */}
             <Route
               path="/new-request"
               element={
@@ -66,6 +65,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
+            {/* Manager-only routes */}
             <Route
               path="/pending-approvals"
               element={
@@ -76,6 +77,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
+            {/* HR-only routes */}
             <Route
               path="/hr-approvals"
               element={
@@ -86,6 +89,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
             <Route
               path="/users"
               element={
@@ -97,19 +101,33 @@ function App() {
               }
             />
             
-            {/* Default redirect */}
+            {/* Manager and HR history routes */}
+            <Route
+              path="/history"
+              element={
+                <ProtectedRoute requiredRoles={['MANAGER', 'HR']}>
+                  <Layout>
+                    <History />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Default redirects */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
           
-          {/* Toast notifications */}
+          {/* Global toast notifications */}
           <Toaster
             position="top-right"
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
+                background: '#1f2937',
+                color: '#f9fafb',
+                borderRadius: '12px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
               },
               success: {
                 duration: 3000,
