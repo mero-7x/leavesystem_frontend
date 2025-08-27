@@ -26,9 +26,9 @@ const Sidebar: React.FC = () => {
     navigate('/login');
   };
 
-  const getRoleConfig = (role: string) => {
+  const getRoleConfig = (role: number) => {
     switch (role) {
-      case 'EMPLOYEE':
+      case 2:
         return {
           color: 'from-green-500 to-emerald-600',
           bgColor: 'bg-green-50',
@@ -36,7 +36,7 @@ const Sidebar: React.FC = () => {
           icon: Briefcase,
           title: 'Employee Portal'
         };
-      case 'MANAGER':
+      case 1:
         return {
           color: 'from-blue-500 to-indigo-600',
           bgColor: 'bg-blue-50',
@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
           icon: UserCheck,
           title: 'Manager Dashboard'
         };
-      case 'HR':
+      case 0:
         return {
           color: 'from-purple-500 to-violet-600',
           bgColor: 'bg-purple-50',
@@ -63,26 +63,28 @@ const Sidebar: React.FC = () => {
     }
   };
 
-  const getNavItems = (role: string) => {
+  const getNavItems = (role: number) => {
     const baseItems = [
-      { to: '/dashboard', icon: Home, label: 'Dashboard' }
+      { to: '/dashboard', icon: Home, label: 'Dashboard' },
+      
+      
     ];
 
     switch (role) {
-      case 'EMPLOYEE':
+      case 2:
         return [
           ...baseItems,
           { to: '/my-requests', icon: FileText, label: 'My Leave Requests' },
           { to: '/new-request', icon: Calendar, label: 'Request Leave' }
         ];
-      case 'MANAGER':
+      case 1:
         return [
           ...baseItems,
           // { to: '/new-request', icon: Calendar, label: 'New Request' },
           { to: '/pending-approvals', icon: Clock, label: 'Team Approvals' },
           { to: '/history', icon: FileText, label: 'Approval History' }
         ];
-      case 'HR':
+      case 0:
         return [
           ...baseItems,
           // { to: '/new-request', icon: Calendar, label: 'New Request' },
@@ -112,9 +114,9 @@ const Sidebar: React.FC = () => {
         <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
-              <span className="text-sm font-semibold">
+              {/* <span className="text-sm font-semibold">
                 {user.name}
-              </span>
+              </span> */}
             </div>
             <div>
               <p className="font-semibold text-sm">{user.name} </p>
@@ -156,9 +158,9 @@ const Sidebar: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-gray-600">
-            {user.role ===  'EMPLOYEE' && 'Submit and track your leave requests'}
-            {user.role === 'MANAGER' && 'Approve team leave requests'}
-            {user.role === 'HR' && 'Manage users and final approvals'}
+            {user.role ===  2 && 'Submit and track your leave requests'}
+            {user.role === 1 && 'Approve team leave requests'}
+            {user.role === 0 && 'Manage users and final approvals'}
           </p>
         </div>
       </div>

@@ -2,8 +2,8 @@ import React from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, Ban } from 'lucide-react';
 
 interface StatusBadgeProps {
-  status: 'Pending' | 'Manager_Approved' | 'HR_Approved' | 'Rejected' | 'Cancelled';
-  size?: 'sm' | 'md' | 'lg';
+  status: 'Pending' | 'Manager_Approved' | 'HR_Approved' | 'Rejected' | 'Cancelled'|any;
+  size?: 'sm' | 'md' | 'lg' |any;
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
