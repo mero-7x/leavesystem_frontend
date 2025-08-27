@@ -37,6 +37,7 @@ const Dashboard: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<LeaveRequest[]>([]);
   const [hrRequests, setHrRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hrUsersCount, setHrUsersCount] = useState<number>(0);
 const[counts,setCounts]=useState<LeaveCounts>({
   pending:0,
   managerApproved:0,
@@ -58,6 +59,14 @@ const[counts,setCounts]=useState<LeaveCounts>({
         if (user?.role === "HR") {
           const hrApprovals = await apiService.getManagerApprovedRequests();
           setHrRequests(hrApprovals);
+
+          // Fetch HR users list count for dashboard card
+          try {
+            const usersRes = await apiService.getHRAllUsers({ page: 1, pageSize: 20, sortBy: 'id', desc: true });
+            setHrUsersCount(usersRes.count ?? usersRes.data?.length ?? 0);
+          } catch {
+            // keep silent here, general error toast already shown above
+          }
         }
       } catch (error) {
         toast.error("Failed to load dashboard data");
@@ -196,13 +205,13 @@ useEffect(() => {
         ];
       case "HR":
         return [
-          {
-            title: "My Requests",
-            value: myRequests.length,
-            icon: FileText,
-            color: "from-blue-500 to-blue-600",
-            bgColor: "bg-blue-50",
-          },
+          // {
+          //   title: "My Requests",
+          //   value: myRequests.length,
+          //   icon: FileText,
+          //   color: "from-blue-500 to-blue-600",
+          //   bgColor: "bg-blue-50",
+          // },
           {
             title: "Awaiting Final",
             value: hrRequests.length,
@@ -219,7 +228,7 @@ useEffect(() => {
           },
           {
             title: "System Users",
-            value: 10,
+            value: hrUsersCount,
             icon: Users,
             color: "from-purple-500 to-purple-600",
             bgColor: "bg-purple-50",
