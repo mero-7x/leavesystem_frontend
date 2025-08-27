@@ -21,14 +21,14 @@ const History: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
 const raw = localStorage.getItem('user');
-const role = raw ? (JSON.parse(raw)?.role as 'HR' | 'MANAGER' | 'EMPLOYEE' | undefined) : undefined;
+const role = raw ? (JSON.parse(raw)?.role as 0 | 1 | 2 | undefined) : undefined;
 
-const getRoleFromLocalStorage = (): 'HR' | 'MANAGER' | 'EMPLOYEE' | null => {
+const getRoleFromLocalStorage = (): 0 | 1 | 2 | null => {
   const raw = localStorage.getItem('user');
   if (!raw) return null;
   try {
-    const obj = JSON.parse(raw) as { role?: string };
-    if (obj.role === 'HR' || obj.role === 'MANAGER' || obj.role === 'EMPLOYEE') {
+    const obj = JSON.parse(raw) as { role?: number };
+    if (obj.role === 0 || obj.role === 1 || obj.role === 2) {
       return obj.role;
     }
     return null;
@@ -55,11 +55,11 @@ useEffect(() => {
     try {
       const role = getRoleFromLocalStorage();
 
-      if (role === 'HR') {
+      if (role === 0) {
         const res = await apiService.getHRPending(); // { success, count, data: ManagerApprovedItem[] }
         setRows(res.data.map(mapManagerApprovedToLeave));
         
-      } else if (role === 'MANAGER') {
+      } else if (role === 1) {
         const data = await apiService.getManagerApprovedRequests(); // LeaveRequest[]
         setRows(data);
       } else {
@@ -76,7 +76,7 @@ useEffect(() => {
   if (loading) return <LoadingSpinner />;
 
   const roleConfig =
-    user?.role === 'HR'
+    user?.role === 0
       ? { title: 'Manager-Approved Requests', subtitle: 'Ready for HR review', color: 'from-purple-500 to-violet-600', icon: FileText }
       : { title: 'Manager Approval History', subtitle: 'Requests approved by Manager', color: 'from-blue-500 to-indigo-600', icon: CheckCircle };
 

@@ -11,7 +11,7 @@ const Register: React.FC = () => {
     password: '',
     name: '',
     email: '',
-    role: 'EMPLOYEE' as 'EMPLOYEE' | 'MANAGER' | 'HR',
+    role: 2 as 2 | 1 | 0,
     department: '',
   });
   const [loading, setLoading] = useState(false);

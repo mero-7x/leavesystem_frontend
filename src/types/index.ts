@@ -4,9 +4,9 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
+  role:  number;
   department?: string;
-  username?: string;
+  username?: string |number;
   name?: string;
 }
 
@@ -30,16 +30,52 @@ export interface LeaveRequest {
   name?: string;
   startDate?: string;
   endDate?: string;
-  fromDate?: string;
-  toDate?: string;
-  leaveType: string;
+  fromDate?: string | any;
+  toDate?: string | any;
+  leaveType?: string |any;
   reason: string;
-  status: LeaveStatus;
+  status: LeaveStatus | any;
   createdAt: string;
   updatedAt: string;
   userName?: string;
   rejectionReason?: string;
+  
 }
+
+
+// src/types/LeaveRequest.ts
+
+export interface LeaveRequest3 {
+  id: number;
+  userId: number;
+  userName: string;
+  managerName: string;
+  fromDate: string;   // ISO (e.g. "2025-08-25T12:20:54Z")
+  toDate: string;     // ISO
+  leaveType: number;  // 0=Annual, 1=Sick, 2=Unpaid (example)
+  reason: string;
+  status: number;     // 0=Pending, 1=Mgr Approved, 2=HR Approved, 3=Rejected, 4=Cancelled
+  createdAt: string;  // "YYYY-MM-DD HH:mm:ss"
+}
+
+// Enums (adjust if your backend uses different codes)
+export enum LeaveTypeCode { Annual = 0, Sick = 1, Unpaid = 2 }
+export enum LeaveStatusCode { Pending = 0, Manager_Approved = 1, HRApproved = 2, Rejected = 3, Cancelled = 4 }
+
+export const LeaveTypeLabelByCode: Record<number, string> = {
+  [LeaveTypeCode.Annual]: 'Annual',
+  [LeaveTypeCode.Sick]: 'Sick',
+  [LeaveTypeCode.Unpaid]: 'Unpaid',
+};
+
+export const LeaveStatusLabelByCode: Record<number, string> = {
+  [LeaveStatusCode.Pending]: 'Pending',
+  [LeaveStatusCode.Manager_Approved]: 'Manager Approved',
+  [LeaveStatusCode.HRApproved]: 'Approved',
+  [LeaveStatusCode.Rejected]: 'Rejected',
+  [LeaveStatusCode.Cancelled]: 'Cancelled',
+};
+
 
 // ---------- Generic API envelope ----------
 export type ApiListResponse<T> = {

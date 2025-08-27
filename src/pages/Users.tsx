@@ -38,9 +38,9 @@ const Users: React.FC = () => {
 
   const roleOptions = [
     { value: 'all', label: 'All Roles' },
-    { value: 'EMPLOYEE ', label: 'Employee' },
-    { value: 'MANAGER', label: 'Manager' },
-    { value: 'HR', label: 'HR' },
+    { value: 'EMPLOYEE ', label: 2 },
+    { value: 1, label: 1 },
+    { value: 0, label: 0 },
   ];
 
   const departmentOptions = [
@@ -144,9 +144,9 @@ const Users: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.role === 'HR' 
+                        user.role === 0 
                           ? 'bg-purple-100 text-purple-800'
-                          : user.role === 'MANAGER' 
+                          : user.role === 1 
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-green-100 text-green-800'
                       }`}>

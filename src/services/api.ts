@@ -1,7 +1,7 @@
 import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest } from '../types';
 import { mockApiService } from './mockApi';
 
-const API_BASE_URL = 'http://localhost:5299/api';
+const API_BASE_URL = 'https://leavesystem-production-a4d3.up.railway.app/api';
 const USE_MOCK_API = false; // Set to false when connecting to real API
 
 /**
@@ -75,7 +75,7 @@ class ApiService {
     password: string;
     name: string;
     email: string;
-    role: 'Employee' | 'Manager' | 'HR';
+    role: 2 | 1 | 0;
     department: string;
   }): Promise<AuthResponse> {
     if (USE_MOCK_API) {
@@ -124,7 +124,7 @@ class ApiService {
     
     const user = this.getCurrentUser();
     const response = await fetch(
-      `${API_BASE_URL}/LeaveRequest/${user.id}`, 
+      `${API_BASE_URL}/LeaveRequest/my`, 
       { headers: this.getAuthHeader() }
     );
     return this.handleResponse<LeaveRequest[]>(response);
