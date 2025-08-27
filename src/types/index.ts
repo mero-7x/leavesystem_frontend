@@ -4,8 +4,8 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role:  number;
-  department?: string;
+  role:  string;
+  departmentName?: string;
   username?: string |number;
   name?: string;
 }
@@ -13,6 +13,7 @@ export interface User {
 export interface AuthResponse {
   token: string;
   user: User;
+  departmentName?: string;
 }
 
 // ---------- App-wide Leave model ----------
@@ -42,7 +43,13 @@ export interface LeaveRequest {
   
 }
 
+export type Status = 'pending' | 'managerApproved' | 'hrApproved' | 'rejected';
 
+export type Counts = Record<Status, number>;
+
+export interface CountResponse {
+  count: Counts;
+}
 // src/types/LeaveRequest.ts
 
 export interface LeaveRequest3 {

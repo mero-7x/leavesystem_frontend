@@ -46,7 +46,7 @@ function App() {
             <Route
               path="/my-requests"
               element={
-                <ProtectedRoute requiredRoles={[2]}>
+                <ProtectedRoute requiredRoles={["EMPLOYEE"]}>
                   <Layout>
                     <MyRequests />
                   </Layout>
@@ -70,7 +70,7 @@ function App() {
             <Route
               path="/pending-approvals"
               element={
-                <ProtectedRoute requiredRoles={[1]}>
+                <ProtectedRoute requiredRoles={["MANAGER"]}>
                   <Layout>
                     <PendingApprovals />
                   </Layout>
@@ -82,7 +82,7 @@ function App() {
             <Route
               path="/hr-approvals"
               element={
-                <ProtectedRoute requiredRoles={[0]}>
+                <ProtectedRoute requiredRoles={["HR"]}>
                   <Layout>
                     <HRApprovals />
                   </Layout>
@@ -93,7 +93,7 @@ function App() {
             <Route
               path="/users"
               element={
-                <ProtectedRoute requiredRoles={[0]}>
+                <ProtectedRoute requiredRoles={["HR"]}>
                   <Layout>
                     <Users />
                   </Layout>
@@ -105,7 +105,7 @@ function App() {
             <Route
               path="/history"
               element={
-                <ProtectedRoute requiredRoles={[1, 0]}>
+                <ProtectedRoute requiredRoles={["MANAGER", "HR"]}>
                   <Layout>
                     <History />
                   </Layout>

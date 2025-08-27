@@ -75,7 +75,7 @@ class ApiService {
     password: string;
     name: string;
     email: string;
-    role: 2 | 1 | 0;
+role: "EMPLOYEE" | "MANAGER" | "HR";
     department: string;
   }): Promise<AuthResponse> {
     if (USE_MOCK_API) {
@@ -130,6 +130,8 @@ class ApiService {
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
+
+  
   /**
    * Get pending requests for manager approval
    * @returns Array of pending leave requests
