@@ -321,7 +321,7 @@ useEffect(() => {
             <div className={`mt-4 h-2 ${stat.bgColor} rounded-full`}>
               <div
                 className={`h-2 bg-gradient-to-r ${stat.color} rounded-full`}
-                style={{ width: "70%" }}
+                style={{ width: `${stat.value}%` }}
               ></div>
             </div>
           </div>
