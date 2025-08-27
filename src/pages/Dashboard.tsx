@@ -17,12 +17,33 @@ import LoadingSpinner from "../components/UI/LoadingSpinner";
 // import { format } from 'date-fns';
 import toast from "react-hot-toast";
 
+// types.ts
+export type LeaveCounts = {
+  pending: number;
+  managerApproved: number;
+  hrApproved: number;
+  rejected: number;
+};
+
+export type LeaveCountsApiResponse = {
+  count: LeaveCounts;
+};
+
+
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const [myRequests, setMyRequests] = useState<LeaveRequest[]>([]);
   const [pendingRequests, setPendingRequests] = useState<LeaveRequest[]>([]);
   const [hrRequests, setHrRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hrUsersCount, setHrUsersCount] = useState<number>(0);
+const[counts,setCounts]=useState<LeaveCounts>({
+  pending:0,
+  managerApproved:0,
+  hrApproved:0,
+  rejected:0,
+});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,14 +51,22 @@ const Dashboard: React.FC = () => {
         const requests = await apiService.getMyLeaveRequests();
         setMyRequests(requests);
 
-        if (user?.role === 1) {
+        if (user?.role === "MANAGER") {
           const pending = await apiService.getPendingRequests();
           setPendingRequests(pending);
         }
 
-        if (user?.role === 0) {
+        if (user?.role === "HR") {
           const hrApprovals = await apiService.getManagerApprovedRequests();
           setHrRequests(hrApprovals);
+
+          // Fetch HR users list count for dashboard card
+          try {
+            const usersRes = await apiService.getHRAllUsers({ page: 1, pageSize: 20, sortBy: 'id', desc: true });
+            setHrUsersCount(usersRes.count ?? usersRes.data?.length ?? 0);
+          } catch {
+            // keep silent here, general error toast already shown above
+          }
         }
       } catch (error) {
         toast.error("Failed to load dashboard data");
@@ -49,13 +78,45 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, [user?.role]);
 
+// services/auth.ts
+ const getAuthHeader = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+
+
+
+
+// Minimal, but typed & correct:
+const loadCounts = async () => {
+  try {
+    const res = await fetch("https://leavesystem-production-a4d3.up.railway.app/api/LeaveRequest/my/count", {
+      method: "GET",
+      headers: getAuthHeader(),
+    });
+    if (!res.ok) throw new Error('Failed to load count data');
+    const data = await res.json();
+    setCounts(data.count);
+  } catch {
+    toast.error("Failed to load count data");
+  }
+};
+
+useEffect(() => {
+  loadCounts();
+}, [user?.role]);
+
   const getStatusCount = (status: number) => {
     return myRequests.filter((req) => req.status === status).length;
   };
 
   const getRoleSpecificStats = () => {
     switch (user?.role) {
-      case 2:
+      case "EMPLOYEE":
         return [
           {
             title: "Total Requests",
@@ -66,44 +127,52 @@ const Dashboard: React.FC = () => {
           },
           {
             title: "Pending",
-            value: getStatusCount(0),
+            value: counts.pending,
+            // value: getStatusCount(1),
             icon: Clock,
             color: "from-yellow-500 to-yellow-600",
             bgColor: "bg-yellow-50",
           },
           {
             title: "Approved",
-            value: getStatusCount(2),
+            value: counts.hrApproved,
+            icon: CheckCircle,
+            color: "from-green-500 to-green-600",
+            bgColor: "bg-green-50",
+          },
+          // {
+          //   title: "This Month",
+          //   value: myRequests.filter(
+          //     (req) =>
+          //       new Date(req.createdAt).getMonth() === new Date().getMonth()
+          //   ).length,
+          //   icon: Calendar,
+          //   color: "from-purple-500 to-purple-600",
+          //   bgColor: "bg-purple-50",
+          // },
+          // {
+          //   title: "Process",
+          //   value: counts.,
+          //   icon: Calendar,
+          //   color: "from-purple-500 to-purple-600",
+          //   bgColor: "bg-purple-50",
+          // },
+             {
+            title: "Process",
+            value: counts.managerApproved,
             icon: CheckCircle,
             color: "from-green-500 to-green-600",
             bgColor: "bg-green-50",
           },
           {
-            title: "This Month",
-            value: myRequests.filter(
-              (req) =>
-                new Date(req.createdAt).getMonth() === new Date().getMonth()
-            ).length,
-            icon: Calendar,
-            color: "from-purple-500 to-purple-600",
-            bgColor: "bg-purple-50",
-          },
-          {
-            title: "Process",
-            value: 1,
-            icon: Calendar,
-            color: "from-purple-500 to-purple-600",
-            bgColor: "bg-purple-50",
-          },
-          {
             title: "Reject",
-            value: getStatusCount(3),
+            value: counts.rejected,
             icon: X,
             color: "from-red-500 to-red-600",
             bgColor: "bg-purple-50",
           },
         ];
-      case 1:
+      case "MANAGER":
         return [
           {
             title: "My Requests",
@@ -134,15 +203,15 @@ const Dashboard: React.FC = () => {
             bgColor: "bg-indigo-50",
           },
         ];
-      case 0:
+      case "HR":
         return [
-          {
-            title: "My Requests",
-            value: myRequests.length,
-            icon: FileText,
-            color: "from-blue-500 to-blue-600",
-            bgColor: "bg-blue-50",
-          },
+          // {
+          //   title: "My Requests",
+          //   value: myRequests.length,
+          //   icon: FileText,
+          //   color: "from-blue-500 to-blue-600",
+          //   bgColor: "bg-blue-50",
+          // },
           {
             title: "Awaiting Final",
             value: hrRequests.length,
@@ -159,7 +228,7 @@ const Dashboard: React.FC = () => {
           },
           {
             title: "System Users",
-            value: 10,
+            value: hrUsersCount,
             icon: Users,
             color: "from-purple-500 to-purple-600",
             bgColor: "bg-purple-50",
@@ -172,19 +241,19 @@ const Dashboard: React.FC = () => {
 
   const getRoleWelcomeMessage = () => {
     switch (user?.role) {
-      case 2:
+      case "EMPLOYEE":
         return {
           title: `Welcome back, ${user?.name}!`,
           subtitle: "Manage your leave requests and track their status",
           color: "from-green-500 to-emerald-600",
         };
-      case 1:
+      case "MANAGER":
         return {
           title: `Good day, ${user?.name}!`,
           subtitle: "Review team requests and manage your own leave",
           color: "from-blue-500 to-indigo-600",
         };
-      case 0:
+      case "HR":
         return {
           title: `Hello, ${user?.name}!`,
           subtitle: "Oversee all leave requests and manage system users",
@@ -218,7 +287,7 @@ const Dashboard: React.FC = () => {
             <div className="mt-4 flex items-center space-x-4 text-sm opacity-80">
               <span>Role: {user?.role}</span>
               <span>•</span>
-              <span>Department: {user?.department}</span>
+              <span>Department: {user?.departmentName}</span>
             </div>
           </div>
           <div className="hidden md:block">
@@ -252,7 +321,7 @@ const Dashboard: React.FC = () => {
             <div className={`mt-4 h-2 ${stat.bgColor} rounded-full`}>
               <div
                 className={`h-2 bg-gradient-to-r ${stat.color} rounded-full`}
-                style={{ width: "70%" }}
+                style={{ width: `${stat.value}%` }}
               ></div>
             </div>
           </div>
@@ -260,7 +329,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Role-specific content */}
-      {user?.role === 1 && pendingRequests.length > 0 && (
+      {user?.role === "MANAGER" && pendingRequests.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center space-x-3">
@@ -302,7 +371,7 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {user?.role === 0 && hrRequests.length > 0 && (
+      {user?.role === "HR" && hrRequests.length > 0 && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center space-x-3">

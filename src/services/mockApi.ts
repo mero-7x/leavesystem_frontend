@@ -8,8 +8,8 @@ const mockUsers: User[] = [
     firstName: 'أحمد',
     lastName: 'محمد',
     name: 'أحمد محمد',
-    role: 2,
-    department: 'تطوير البرمجيات',
+    role: "EMPLOYEE",
+    departmentName: 'تطوير البرمجيات',
     username: 2
   },
   {
@@ -18,8 +18,8 @@ const mockUsers: User[] = [
     firstName: 'سارة',
     lastName: 'أحمد',
     name: 'سارة أحمد',
-    role: 1,
-    department: 'تطوير البرمجيات',
+    role: "MANAGER",
+    departmentName: 'تطوير البرمجيات',
     username: 1
   },
   {
@@ -28,8 +28,8 @@ const mockUsers: User[] = [
     firstName: 'محمد',
     lastName: 'علي',
     name: 'محمد علي',
-    role: 0,
-    department: 'الموارد البشرية',
+    role: "HR",
+    departmentName: 'الموارد البشرية',
     username: 0
   },
   {
@@ -38,8 +38,8 @@ const mockUsers: User[] = [
     firstName: 'فاطمة',
     lastName: 'حسن',
     name: 'فاطمة حسن',
-    role: 2,
-    department: 'التسويق',
+    role: "EMPLOYEE",
+    departmentName: 'التسويق',
     username: 'employee2'
   },
   {
@@ -48,8 +48,8 @@ const mockUsers: User[] = [
     firstName: 'خالد',
     lastName: 'عبدالله',
     name: 'خالد عبدالله',
-    role: 2,
-    department: 'المبيعات',
+    role: "EMPLOYEE",
+    departmentName: 'المبيعات',
     username: 'employee3'
   }
 ];
@@ -209,7 +209,7 @@ class MockApiService {
     password: string;
     name: string;
     email: string;
-    role: 2 | 1 | 0;
+    role: "EMPLOYEE" | "MANAGER" | "HR";
     department: string;
   }): Promise<AuthResponse> {
     await this.delay();
@@ -227,7 +227,7 @@ class MockApiService {
       lastName: nameParts.slice(1).join(' ') || '',
       name: userData.name,
       role: userData.role,
-      department: userData.department,
+      departmentName: userData.department,
       username: userData.username
     };
 
@@ -294,7 +294,7 @@ class MockApiService {
   async getPendingRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 1) {
+    if (!currentUser || currentUser.role !== "MANAGER") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -308,7 +308,7 @@ class MockApiService {
   async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 0) {
+    if (!currentUser || currentUser.role !== "HR") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -324,7 +324,7 @@ class MockApiService {
   async managerApprove(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 1) {
+    if (!currentUser || currentUser.role !== "MANAGER") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -344,7 +344,7 @@ class MockApiService {
   async managerReject(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 1) {
+    if (!currentUser || currentUser.role !== "MANAGER") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -364,7 +364,7 @@ class MockApiService {
   async managerCancel(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 1) {
+    if (!currentUser || currentUser.role !== "MANAGER") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -386,7 +386,7 @@ class MockApiService {
   async hrApprove(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 0) {
+    if (!currentUser || currentUser.role !== "HR") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -406,7 +406,7 @@ class MockApiService {
   async hrReject(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 0) {
+    if (!currentUser || currentUser.role !== "HR") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -426,7 +426,7 @@ class MockApiService {
   async hrCancel(id: string): Promise<void> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 0) {
+    if (!currentUser || currentUser.role !== "HR") {
       throw new Error('غير مصرح لك بالوصول');
     }
 
@@ -448,7 +448,7 @@ class MockApiService {
   async getUsers(): Promise<User[]> {
     await this.delay();
 
-    if (!currentUser || currentUser.role !== 0) {
+    if (!currentUser || currentUser.role !== "HR") {
       throw new Error('غير مصرح لك بالوصول');
     }
 

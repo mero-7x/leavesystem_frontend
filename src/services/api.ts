@@ -1,4 +1,4 @@
-import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest } from '../types';
+import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse } from '../types';
 import { mockApiService } from './mockApi';
 
 const API_BASE_URL = 'https://leavesystem-production-a4d3.up.railway.app/api';
@@ -75,7 +75,7 @@ class ApiService {
     password: string;
     name: string;
     email: string;
-    role: 2 | 1 | 0;
+role: "EMPLOYEE" | "MANAGER" | "HR";
     department: string;
   }): Promise<AuthResponse> {
     if (USE_MOCK_API) {
@@ -130,6 +130,8 @@ class ApiService {
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
+
+  
   /**
    * Get pending requests for manager approval
    * @returns Array of pending leave requests
@@ -322,6 +324,44 @@ class ApiService {
       headers: this.getAuthHeader(),
     });
     return this.handleResponse<User[]>(response);
+  }
+
+  /**
+   * Get paginated users for HR dashboard
+   * Mirrors backend endpoint: /hr/All-users
+   */
+  async getHRAllUsers(params: {
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    desc?: boolean;
+  } = {}): Promise<ApiListResponse<User>> {
+    if (USE_MOCK_API) {
+      const users = await mockApiService.getUsers();
+      return { success: true, count: users.length, data: users };
+    }
+
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy = 'id',
+      desc = true,
+    } = params;
+
+    const url = new URL(`${API_BASE_URL}/hr/All-users`);
+    url.searchParams.set('page', String(page));
+    url.searchParams.set('pageSize', String(pageSize));
+    url.searchParams.set('sortBy', String(sortBy));
+    url.searchParams.set('desc', String(desc));
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeader(),
+      },
+    });
+    return this.handleResponse<ApiListResponse<User>>(response);
   }
 }
 
