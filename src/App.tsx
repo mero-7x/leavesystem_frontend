@@ -15,6 +15,7 @@ import PendingApprovals from './pages/PendingApprovals';
 import HRApprovals from './pages/HRApprovals';
 import Users from './pages/Users';
 import History from './pages/History';
+import HRDashboard from './pages/HRDashboard';
 
 /**
  * Main App Component
@@ -79,6 +80,16 @@ function App() {
             />
             
             {/* HR-only routes */}
+             <Route
+              path="/HRDashboard"
+              element={
+                <ProtectedRoute requiredRoles={["HR"]}>
+                  <Layout>
+                    <HRDashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/hr-approvals"
               element={

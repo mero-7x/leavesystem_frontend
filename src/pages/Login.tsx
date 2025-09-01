@@ -10,7 +10,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,9 +19,13 @@ const Login: React.FC = () => {
   
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(from, { replace: true });
+      if (user?.role === 'HR') {
+        navigate('/HRDashboard', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, navigate, from, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +35,11 @@ const Login: React.FC = () => {
       const response = await apiService.login(username, password);
       login(response.token, response.user);
       toast.success(`Welcome back, ${response.user.name}!`);
-      navigate(from, { replace: true });
+      if (response.user.role === 'HR') {
+        navigate('/HRDashboard', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed');
     } finally {

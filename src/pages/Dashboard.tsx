@@ -44,9 +44,11 @@ const[counts,setCounts]=useState<LeaveCounts>({
   hrApproved:0,
   rejected:0,
 });
-
   useEffect(() => {
+
+    // if (user?.role !== "EMPLOYEE") return;
     const fetchData = async () => {
+      
       try {
         const requests = await apiService.getMyLeaveRequests();
         setMyRequests(requests);
@@ -93,6 +95,7 @@ const[counts,setCounts]=useState<LeaveCounts>({
 
 // Minimal, but typed & correct:
 const loadCounts = async () => {
+  if (user?.role !== "EMPLOYEE") return;
   try {
     const res = await fetch("https://leavesystem-production-a4d3.up.railway.app/api/LeaveRequest/my/count", {
       method: "GET",
