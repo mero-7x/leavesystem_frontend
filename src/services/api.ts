@@ -1,8 +1,14 @@
-import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse } from '../types';
+import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse, HRPendingResponse } from '../types';
 import { mockApiService } from './mockApi';
+import axios from 'axios';
 
 const API_BASE_URL = 'https://leavesystem-production-a4d3.up.railway.app/api';
 const USE_MOCK_API = false; // Set to false when connecting to real API
+
+const api = axios.create({
+  baseURL: 'https://leavesystem-production-a4d3.up.railway.app', // <- change if you have env vars
+  headers: { 'Content-Type': 'application/json' },
+});
 
 /**
  * Main API Service Class
@@ -90,6 +96,8 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
     return this.handleResponse<AuthResponse>(response);
   }
 
+
+
   // ==================== LEAVE REQUEST ENDPOINTS ====================
 
   /**
@@ -130,6 +138,19 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
+ async getHRPending2() {
+    return api.get<HRPendingResponse>('/api/hr/pending-requests');
+  }
+
+  // POST /api/hr/approve/{id}  body: { reason: string }
+  async hrApprove2(id: string, reason: string) {
+    return api.post(`/api/hr/approve/${id}`, { reason });
+  }
+
+  // POST /api/hr/reject/{id}   body: { reason: string }
+  async hrReject2(id: string, reason: string) {
+    return api.post(`/api/hr/reject/${id}`, { reason });
+  }
 
   
   /**

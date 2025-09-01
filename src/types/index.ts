@@ -129,3 +129,21 @@ export interface ApiError {
   message: string;
   details?: string[];
 }
+
+// export type ManagerApprovedItem = {
+//   id: number;
+//   userId: number;
+//   userName: string;
+//   managerName?: string;
+//   fromDate: string; // ISO
+//   toDate: string;   // ISO
+//   leaveType: string;
+//   reason: string;
+//   status: 'ManagerApproved' | string;
+//   createdAt: string;
+// };
+
+export type HRPendingResponse = {
+  count: number;
+  leaveRequests: ManagerApprovedItem[];
+};
