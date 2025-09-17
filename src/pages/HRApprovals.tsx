@@ -1,8 +1,7 @@
-// pages/HRApprovals.tsx
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, Filter, User, Ban, Calendar } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { CheckCircle, XCircle, Clock, Filter, User, Ban } from 'lucide-react';
 import { apiService } from '../services/api';
-import { ManagerApprovedItem } from '../types';
+import type { ManagerApprovedItem } from '../types';
 import StatusBadge from '../components/UI/StatusBadge';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import RejectionModal from '../components/UI/RejectionModal';
@@ -11,15 +10,12 @@ import toast from 'react-hot-toast';
 
 const HRApprovals: React.FC = () => {
   const [requests, setRequests] = useState<ManagerApprovedItem[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<ManagerApprovedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [leaveTypeFilter, setLeaveTypeFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
 
-  // one modal reused for approve or reject
   const [reasonModal, setReasonModal] = useState<{
     isOpen: boolean;
     mode: 'approve' | 'reject';
@@ -34,14 +30,10 @@ const HRApprovals: React.FC = () => {
     fetchHrPending();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [requests, departmentFilter, leaveTypeFilter, sortBy]);
-
   const fetchHrPending = async () => {
+    setLoading(true);
     try {
       const res = await apiService.getHRPending2();
-      // response shape: { count, leaveRequests: [...] }
       setRequests(res.data.leaveRequests || []);
     } catch (error) {
       console.error('Error fetching HR pending requests:', error);
@@ -51,47 +43,43 @@ const HRApprovals: React.FC = () => {
     }
   };
 
-  const applyFilters = () => {
-    let filtered = [...requests];
-
-    if (departmentFilter !== 'all') {
-      filtered = filtered.filter(() => true);
-    }
+  const filteredRequests = useMemo(() => {
+    let list = [...requests];
 
     if (leaveTypeFilter !== 'all') {
-      filtered = filtered.filter((req) => req.leaveType === leaveTypeFilter);
+      list = list.filter((req) => req.leaveType === leaveTypeFilter);
     }
 
     switch (sortBy) {
       case 'recent':
-        filtered.sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        list.sort(
+          (a, b) =>
+            new Date((b.createdAt ?? '').replace(' ', 'T')).getTime() -
+            new Date((a.createdAt ?? '').replace(' ', 'T')).getTime()
         );
         break;
       case 'oldest':
-        filtered.sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        list.sort(
+          (a, b) =>
+            new Date((a.createdAt ?? '').replace(' ', 'T')).getTime() -
+            new Date((b.createdAt ?? '').replace(' ', 'T')).getTime()
         );
         break;
       case 'name':
-        filtered.sort((a, b) => (a.userName || '').localeCompare(b.userName || ''));
+        list.sort((a, b) => (a.userName || '').localeCompare(b.userName || ''));
         break;
     }
 
-    setFilteredRequests(filtered);
-  };
+    return list;
+  }, [requests, leaveTypeFilter, sortBy]);
 
-  // open popup for APPROVE
   const openApproveModal = (request: ManagerApprovedItem) => {
     setReasonModal({ isOpen: true, mode: 'approve', request });
   };
-
-  // open popup for REJECT
   const openRejectModal = (request: ManagerApprovedItem) => {
     setReasonModal({ isOpen: true, mode: 'reject', request });
   };
 
-  // confirm from popup (both approve/reject call here)
   const confirmWithReason = async (reason: string) => {
     if (!reasonModal.request) return;
     const { id } = reasonModal.request;
@@ -115,7 +103,6 @@ const HRApprovals: React.FC = () => {
     }
   };
 
-  // (optional) keep cancel if you have an API for it; otherwise you can remove this button.
   const handleCancel = async (leave_id: number) => {
     if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) return;
     setActionLoading(leave_id);
@@ -134,7 +121,6 @@ const HRApprovals: React.FC = () => {
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return '';
     try {
-      // handles both "2025-08-25T..." and "2025-08-25 13:09:55"
       const normalized = dateString.replace(' ', 'T');
       return format(new Date(normalized.split('T')[0]), 'MMM dd, yyyy');
     } catch {
@@ -142,15 +128,15 @@ const HRApprovals: React.FC = () => {
     }
   };
 
-  const uniqueLeaveTypes = Array.from(new Set(requests.map((req) => req.leaveType)));
+  const uniqueLeaveTypes = useMemo(
+    () => Array.from(new Set(requests.map((req) => req.leaveType))).filter(Boolean),
+    [requests]
+  );
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-8">
-      {/* header & stats unchanged ... */}
-
-      {/* Filters */}
       <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-3">
@@ -199,7 +185,6 @@ const HRApprovals: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-3xl shadow-xl border border-gray-100">
         {filteredRequests.length === 0 ? (
           <div className="text-center py-20">
@@ -262,8 +247,10 @@ const HRApprovals: React.FC = () => {
                       </td>
 
                       <td className="px-8 py-6">
-                        <div className="text-sm text-gray-900 max-w-xs" title={request.reason}>
-                          {request.reason?.length > 50 ? `${request.reason.substring(0, 50)}...` : request.reason}
+                        <div className="text-sm text-gray-900 max-w-xs" title={request.reason ?? ''}>
+                          {request.reason && request.reason.length > 50
+                            ? `${request.reason.substring(0, 50)}...`
+                            : (request.reason ?? '')}
                         </div>
                       </td>
 
@@ -287,14 +274,7 @@ const HRApprovals: React.FC = () => {
                             رفض
                           </button>
 
-                          <button
-                            onClick={() => handleCancel(request.id)}
-                            disabled={actionLoading === request.id}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-semibold rounded-2xl text-white bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            <Ban className="w-4 h-4 mr-2" />
-                            إلغاء
-                          </button>
+                      
                         </div>
                       </td>
                     </tr>
@@ -306,17 +286,16 @@ const HRApprovals: React.FC = () => {
         )}
       </div>
 
-      {/* Reason Modal used for both approve & reject */}
+      {/* Modal */}
       <RejectionModal
-  isOpen={reasonModal.isOpen}
-  onClose={() => setReasonModal({ isOpen: false, mode: 'reject', request: null })}
-  onConfirm={confirmWithReason}
-  employeeName={reasonModal.request?.userName || ''}
-  leaveType={reasonModal.request?.leaveType || ''}
-  loading={actionLoading === reasonModal.request?.id}
-  mode={reasonModal.mode}
-/>
-
+        isOpen={reasonModal.isOpen}
+        onClose={() => setReasonModal({ isOpen: false, mode: 'reject', request: null })}
+        onConfirm={confirmWithReason}
+        employeeName={reasonModal.request?.userName || ''}
+        leaveType={reasonModal.request?.leaveType || ''}
+        loading={actionLoading === reasonModal.request?.id}
+        mode={reasonModal.mode}
+      />
     </div>
   );
 };

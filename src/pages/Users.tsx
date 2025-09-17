@@ -1,108 +1,155 @@
-import React, { useState, useEffect } from 'react';
-import { Users as UsersIcon, Filter } from 'lucide-react';
-import { apiService } from '../services/api';
-import { User } from '../types';
-import LoadingSpinner from '../components/UI/LoadingSpinner';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useMemo } from "react";
+import { Users as UsersIcon, Filter } from "lucide-react";
+import { apiService } from "../services/api";
+import { User } from "../types";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
+import toast from "react-hot-toast";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [isActiveFilter, setIsActiveFilter] = useState<"true" | "false" | "all">("true"); // ✅ default to active
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
-        const data = await apiService.getUsers();
-        setUsers(data);
+        const data = await apiService.getUsers({
+  page: 1,
+  pageSize: 20,
+  sortBy: "id",
+  desc: true,
+  isActive: isActiveFilter === "all" ? undefined : isActiveFilter === "true",
+});
+setUsers(data.items);
       } catch (error) {
-        toast.error('Failed to load users');
+        toast.error("Failed to load users");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [isActiveFilter]);
 
-  const filteredUsers = users.filter(user => {
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesDepartment = departmentFilter === 'all' || user.department === departmentFilter;
-    return matchesRole && matchesDepartment;
-  });
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      const matchesDepartment =
+        departmentFilter === "all" ||
+        (user.departmentName) === departmentFilter;
+      return matchesRole && matchesDepartment;
+    });
+  }, [users, roleFilter, departmentFilter]);
 
-  const uniqueDepartments = Array.from(
-    new Set(users.map(user => user.department).filter(Boolean))
-  );
+  const uniqueDepartments = useMemo(() => {
+    return Array.from(
+      new Set(users.map((user) => user.departmentName ).filter(Boolean))
+    );
+  }, [users]);
 
   const roleOptions = [
-    { value: 'all', label: 'All Roles' },
-    { value: 'EMPLOYEE ', label: 2 },
-    { value: 1, label: 1 },
-    { value: 0, label: 0 },
+    { value: "all", label: "All Roles" },
+    { value: "EMPLOYEE", label: "EMPLOYEE" },
+    { value: "MANAGER", label: "MANAGER" },
+    { value: "HR", label: "HR" },
   ];
 
   const departmentOptions = [
-    { value: 'all', label: 'All Departments' },
-    ...uniqueDepartments.map(dept => ({ value: dept!, label: dept! })),
+    { value: "all", label: "All Departments" },
+    ...uniqueDepartments.map((dept) => ({ value: dept!, label: dept! })),
   ];
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-        <p className="text-gray-600 mt-2">View and manage system users</p>
+        <p className="text-gray-600 mt-2">
+          Showing <strong>{filteredUsers.length}</strong> users
+          {isActiveFilter !== "all" && (
+            <> ({isActiveFilter === "true" ? "Active" : "Inactive"} only)</>
+          )}
+        </p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center space-x-4">
+      <div className="bg-white rounded-lg shadow p-6 space-y-4">
+        <div className="flex flex-wrap gap-6 items-center">
           <Filter className="h-5 w-5 text-gray-400" />
-          <div className="flex items-center space-x-4">
+
+          {/* isActive Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <div className="flex gap-2">
+              {["true", "false", "all"].map((val) => (
+                <button
+                  key={val}
+                  onClick={() => setIsActiveFilter(val as "true" | "false" | "all")}
+                  className={`px-3 py-1 rounded-md text-sm border ${
+                    isActiveFilter === val
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300"
+                  }`}
+                >
+                  {val === "true" ? "Active" : val === "false" ? "Inactive" : "All"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Role filter */}
+          <div>
+            <label htmlFor="roleFilter" className="block text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              id="roleFilter"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Department filter */}
+          {uniqueDepartments.length > 0 && (
             <div>
-              <label htmlFor="roleFilter" className="block text-sm font-medium text-gray-700">
-                Role
+              <label
+                htmlFor="departmentFilter"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Department
               </label>
               <select
-                id="roleFilter"
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                id="departmentFilter"
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-                {roleOptions.map(option => (
+                {departmentOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </select>
             </div>
-            
-            {uniqueDepartments.length > 0 && (
-              <div>
-                <label htmlFor="departmentFilter" className="block text-sm font-medium text-gray-700">
-                  Department
-                </label>
-                <select
-                  id="departmentFilter"
-                  value={departmentFilter}
-                  onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  {departmentOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
+      {/* Table */}
       <div className="bg-white rounded-lg shadow">
         {filteredUsers.length === 0 ? (
           <div className="text-center py-12">
@@ -113,7 +160,7 @@ const Users: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-hidden">
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -129,32 +176,30 @@ const Users: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Department
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.role}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {user.name} {user.name}
-                      </div>
+                      {user.departmentName  ?? "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.role === 0 
-                          ? 'bg-purple-100 text-purple-800'
-                          : user.role === 1 
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.department || 'N/A'}</div>
+                      {user.isActive ? (
+                        <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs">
+                          Inactive
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

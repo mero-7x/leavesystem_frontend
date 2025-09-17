@@ -1,34 +1,33 @@
-import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse, HRPendingResponse } from '../types';
+// services/api.ts
+import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse, HRPendingResponse, GetUsersResponse } from '../types';
 import { mockApiService } from './mockApi';
-import axios from 'axios';
+import axios, { AxiosHeaders, type RawAxiosRequestHeaders } from "axios";
 
 const API_BASE_URL = 'https://leavesystem-production-a4d3.up.railway.app/api';
-const USE_MOCK_API = false; // Set to false when connecting to real API
+const USE_MOCK_API = false;
 
 const api = axios.create({
-  baseURL: 'https://leavesystem-production-a4d3.up.railway.app', // <- change if you have env vars
+  baseURL: 'https://leavesystem-production-a4d3.up.railway.app',
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const setAuthToken = (token: string | null) => {
+  if (token) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common["Authorization"];
+  }
+};
+
 /**
  * Main API Service Class
- * Handles all HTTP requests to the backend API
- * Includes authentication, leave requests, and user management
  */
 class ApiService {
-  /**
-   * Get authorization header with current user token
-   * @returns Authorization header object
-   */
   private getAuthHeader(): Record<string, string> {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  /**
-   * Get current user from localStorage
-   * @returns Current user object
-   */
   private getCurrentUser(): User {
     const userJson = localStorage.getItem('user');
     if (!userJson) {
@@ -37,11 +36,6 @@ class ApiService {
     return JSON.parse(userJson) as User;
   }
 
-  /**
-   * Handle API response and error parsing
-   * @param response - Fetch response object
-   * @returns Parsed JSON response
-   */
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'An error occurred' }));
@@ -51,18 +45,8 @@ class ApiService {
   }
 
   // ==================== AUTH ENDPOINTS ====================
-
-  /**
-   * User login
-   * @param username - User's username
-   * @param password - User's password
-   * @returns Authentication response with token and user data
-   */
   async login(username: string, password: string): Promise<AuthResponse> {
-    if (USE_MOCK_API) {
-      return mockApiService.login(username, password);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.login(username, password);
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,23 +55,18 @@ class ApiService {
     return this.handleResponse<AuthResponse>(response);
   }
 
-  /**
-   * User registration
-   * @param userData - User registration data
-   * @returns Authentication response with token and user data
-   */
+
+
+  
   async register(userData: {
     username: string;
     password: string;
     name: string;
     email: string;
-role: "EMPLOYEE" | "MANAGER" | "HR";
+    role: "EMPLOYEE" | "MANAGER" | "HR";
     department: string;
   }): Promise<AuthResponse> {
-    if (USE_MOCK_API) {
-      return mockApiService.register(userData);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.register(userData);
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -97,96 +76,106 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
   }
 
 
+  async getUsersPage(params: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    departmentId?: number;
+    managerId?: number;
+    isActive?: boolean;
+    sortBy?: string;
+    desc?: boolean;
+    role?: string;
+  }): Promise<GetUsersResponse> {
+    const res = await api.get<GetUsersResponse>(`${API_BASE_URL}/hr/All-users`, {
+      params: {
+        page: params.page ?? 1,
+        pageSize: params.pageSize ?? 20,
+        search: params.search,
+        departmentId: params.departmentId,
+        managerId: params.managerId,
+        isActive: params.isActive,   // only present if defined
+        sortBy: params.sortBy ?? "id",
+        desc: params.desc ?? true,
+        role: params.role,
+      },
+    });
+    return res.data;
+  }
 
-  // ==================== LEAVE REQUEST ENDPOINTS ====================
+  // fetch all pages until we collect everything (honors isActive if provided)
+  async getAllUsers(params: {
+    search?: string;
+    departmentId?: number;
+    managerId?: number;
+    isActive?: boolean; // true/false filters, omit for “all”
+    sortBy?: string;
+    desc?: boolean;
+    role?: string;
+  }): Promise<User[]> {
+    const pageSize = 20;
+    let page = 1;
+    let all: User[] = [];
 
-  /**
-   * Create new leave request
-   * @param data - Leave request data
-   * @returns Created leave request
-   */
-  async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
-    if (USE_MOCK_API) {
-      return mockApiService.createLeaveRequest(data);
+    // first page
+    const first = await this.getUsersPage({ page, pageSize, ...params });
+    all = first.items.slice();
+    const total = first.total;
+
+    // keep fetching until we have all items
+    while (all.length < total) {
+      page += 1;
+      const next = await this.getUsersPage({ page, pageSize, ...params });
+      all = all.concat(next.items);
+      // safety break if API misreports total
+      if (next.items.length === 0) break;
     }
-    
+
+    return all;
+  }
+  // ==================== LEAVE REQUEST ENDPOINTS ====================
+  async createLeaveRequest(data: CreateLeaveRequest): Promise<LeaveRequest> {
+    if (USE_MOCK_API) return mockApiService.createLeaveRequest(data);
     const response = await fetch(`${API_BASE_URL}/LeaveRequest`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      },
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
       body: JSON.stringify(data),
     });
     return this.handleResponse<LeaveRequest>(response);
   }
 
-  /**
-   * Get current user's leave requests
-   * @returns Array of user's leave requests
-   */
   async getMyLeaveRequests(): Promise<LeaveRequest[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getMyLeaveRequests();
-    }
-    
-    const user = this.getCurrentUser();
-    const response = await fetch(
-      `${API_BASE_URL}/LeaveRequest/my`, 
-      { headers: this.getAuthHeader() }
-    );
+    if (USE_MOCK_API) return mockApiService.getMyLeaveRequests();
+    const response = await fetch(`${API_BASE_URL}/LeaveRequest/my`, { headers: this.getAuthHeader() });
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
- async getHRPending2() {
+  // ✅ Your Axios GET for HR pending (exactly as you wrote)
+  async getHRPending2() {
     return api.get<HRPendingResponse>('/api/hr/pending-requests');
   }
 
-  // POST /api/hr/approve/{id}  body: { reason: string }
+  // ✅ Your Axios POSTs for final approve/reject (with { reason })
   async hrApprove2(id: string, reason: string) {
     return api.post(`/api/hr/approve/${id}`, { reason });
   }
 
-  // POST /api/hr/reject/{id}   body: { reason: string }
   async hrReject2(id: string, reason: string) {
     return api.post(`/api/hr/reject/${id}`, { reason });
   }
 
-  
-  /**
-   * Get pending requests for manager approval
-   * @returns Array of pending leave requests
-   */
   async getPendingRequests(): Promise<LeaveRequest[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getPendingRequests();
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/manager/pending`, {
-      headers: this.getAuthHeader(),
-    });
+    if (USE_MOCK_API) return mockApiService.getPendingRequests();
+    const response = await fetch(`${API_BASE_URL}/manager/pending`, { headers: this.getAuthHeader() });
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
-  /**
-   * Get manager approved requests for HR
-   * @returns Array of manager approved requests
-   */
   async getManagerApprovedRequests(): Promise<LeaveRequest[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getManagerApprovedRequests();
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/Manager/approved`, {
-      headers: this.getAuthHeader(),
-    });
+    if (USE_MOCK_API) return mockApiService.getManagerApprovedRequests();
+    const response = await fetch(`${API_BASE_URL}/Manager/approved`, { headers: this.getAuthHeader() });
     return this.handleResponse<LeaveRequest[]>(response);
   }
 
-  /**
-   * Get HR pending requests
-   * @returns Manager approved response with data array
-   */
   async getHRPending(): Promise<ManagerApprovedResponse> {
     if (USE_MOCK_API) {
       const requests = await mockApiService.getManagerApprovedRequests();
@@ -206,28 +195,17 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
         }))
       };
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/HR/pending`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      },
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
     });
     return this.handleResponse<ManagerApprovedResponse>(response);
   }
 
   // ==================== MANAGER ACTIONS ====================
-
-  /**
-   * Manager approve leave request
-   * @param leave_id - Leave request ID
-   */
   async managerApprove(leave_id: string): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.managerApprove(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.managerApprove(leave_id);
     const response = await fetch(`${API_BASE_URL}/manager/${leave_id}/approve`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -235,36 +213,18 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
     await this.handleResponse<void>(response);
   }
 
-  /**
-   * Manager reject leave request
-   * @param leave_id - Leave request ID
-   * @param reason - Rejection reason
-   */
   async managerReject(leave_id: string, reason: string = "Rejected by Manager"): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.managerReject(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.managerReject(leave_id);
     const response = await fetch(`${API_BASE_URL}/manager/${leave_id}/reject`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      },
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
       body: JSON.stringify({ reason }),
     });
     await this.handleResponse<void>(response);
   }
 
-  /**
-   * Manager cancel/revoke leave request
-   * @param leave_id - Leave request ID
-   */
   async managerCancel(leave_id: string): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.managerCancel(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.managerCancel(leave_id);
     const response = await fetch(`${API_BASE_URL}/manager/${leave_id}/cancel`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -273,56 +233,27 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
   }
 
   // ==================== HR ACTIONS ====================
-
-  /**
-   * HR approve leave request (final approval)
-   * @param leave_id - Leave request ID
-   */
   async hrApprove(leave_id: string): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.hrApprove(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.hrApprove(leave_id);
     const response = await fetch(`${API_BASE_URL}/HR/${leave_id}/approve`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      }
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
     });
     await this.handleResponse<void>(response);
   }
 
-  /**
-   * HR reject leave request with reason
-   * @param leave_id - Leave request ID
-   * @param reason - Rejection reason
-   */
   async hrReject(leave_id: string, reason: string = "Rejected by HR"): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.hrReject(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.hrReject(leave_id);
     const response = await fetch(`${API_BASE_URL}/HR/${leave_id}/reject`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      },
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
       body: JSON.stringify({ reason })
     });
     await this.handleResponse<void>(response);
   }
 
-  /**
-   * HR cancel/revoke leave request
-   * @param leave_id - Leave request ID
-   */
   async hrCancel(leave_id: string): Promise<void> {
-    if (USE_MOCK_API) {
-      return mockApiService.hrCancel(leave_id);
-    }
-    
+    if (USE_MOCK_API) return mockApiService.hrCancel(leave_id);
     const response = await fetch(`${API_BASE_URL}/HR/${leave_id}/cancel`, {
       method: 'POST',
       headers: this.getAuthHeader(),
@@ -331,26 +262,34 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
   }
 
   // ==================== USER MANAGEMENT ====================
-
-  /**
-   * Get all system users (HR only)
-   * @returns Array of all users
-   */
-  async getUsers(): Promise<User[]> {
-    if (USE_MOCK_API) {
-      return mockApiService.getUsers();
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/users`, {
-      headers: this.getAuthHeader(),
+  async getUsers(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    departmentId?: number;
+    managerId?: number;
+    isActive?: boolean; // ✅ now supported
+    sortBy?: string;
+    desc?: boolean;
+    role?: string;
+  }): Promise<{ items: User[]; total: number }> {
+    const res = await api.get(`${API_BASE_URL}/hr/All-users`, {
+      params: {
+        page: params?.page ?? 1,
+        pageSize: params?.pageSize ?? 20,
+        search: params?.search,
+        departmentId: params?.departmentId,
+        managerId: params?.managerId,
+        isActive: params?.isActive, // ✅ will be true/false if provided
+        sortBy: params?.sortBy ?? "id",
+        desc: params?.desc ?? true,
+        role: params?.role,
+      },
     });
-    return this.handleResponse<User[]>(response);
+    return res.data; // assuming { items, total, ... }
   }
 
-  /**
-   * Get paginated users for HR dashboard
-   * Mirrors backend endpoint: /hr/All-users
-   */
+
   async getHRAllUsers(params: {
     page?: number;
     pageSize?: number;
@@ -377,10 +316,7 @@ role: "EMPLOYEE" | "MANAGER" | "HR";
 
     const response = await fetch(url.toString(), {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeader(),
-      },
+      headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
     });
     return this.handleResponse<ApiListResponse<User>>(response);
   }

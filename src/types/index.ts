@@ -1,20 +1,33 @@
 // ---------- Auth / User ----------
-export interface User {
-  id: string;
+export type User = {
+  id: number;
+  username: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role:  string;
-  departmentName?: string;
-  username?: string |number;
-  name?: string;
-}
+  departmentId: number | null;
+  departmentName: string;  // <-- matches your response
+  managerId: number | null;
+  managerName: string;
+  role: "EMPLOYEE" | "MANAGER" | "HR" | string;
+  isActive: boolean;
+  createdAt: string; // ISO
+};
 
 export interface AuthResponse {
   token: string;
   user: User;
   departmentName?: string;
 }
+
+
+export type GetUsersResponse = {
+  success: boolean;
+  total: number;
+  page: number;
+  pageSize: number;
+  items: User[];
+};
+
 
 // ---------- App-wide Leave model ----------
 export type LeaveStatus =
