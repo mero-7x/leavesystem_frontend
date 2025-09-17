@@ -55,7 +55,14 @@ export interface LeaveRequest {
   rejectionReason?: string;
   
 }
-
+export type Department = {
+  id: number;
+  name: string;
+  managerId: number | null;
+  usersCount: number;
+  userNames: string[] | null;
+  managerName: string | null;
+};
 export type Status = 'pending' | 'managerApproved' | 'hrApproved' | 'rejected';
 
 export type Counts = Record<Status, number>;

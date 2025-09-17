@@ -1,5 +1,5 @@
 // services/api.ts
-import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse, HRPendingResponse, GetUsersResponse } from '../types';
+import { AuthResponse, User, LeaveRequest, CreateLeaveRequest, ManagerApprovedResponse, RejectionRequest, ApiListResponse, HRPendingResponse, GetUsersResponse, Department } from '../types';
 import { mockApiService } from './mockApi';
 import axios, { AxiosHeaders, type RawAxiosRequestHeaders } from "axios";
 
@@ -288,7 +288,10 @@ class ApiService {
     });
     return res.data; // assuming { items, total, ... }
   }
-
+  async getDepartments(): Promise<Department[]> {
+    const res = await api.get<Department[]>(`${API_BASE_URL}/hr/department-list`);
+    return res.data;
+  }
 
   async getHRAllUsers(params: {
     page?: number;
