@@ -7,8 +7,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { apiService, type Department } from "../services/api";
-import type { User } from "../types";
+import { apiService } from "../services/api";
+import type { Department, User } from "../types";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import toast from "react-hot-toast";
 
