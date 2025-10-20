@@ -1,20 +1,33 @@
 // ---------- Auth / User ----------
-export interface User {
-  id: string;
+export type User = {
+  id: number;
+  username: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role:  string;
-  departmentName?: string;
-  username?: string |number;
-  name?: string;
-}
+  departmentId: number | null;
+  departmentName: string;  // <-- matches your response
+  managerId: number | null;
+  managerName: string;
+  role: "EMPLOYEE" | "MANAGER" | "HR" | string;
+  isActive: boolean;
+  createdAt: string; // ISO
+};
 
 export interface AuthResponse {
   token: string;
   user: User;
   departmentName?: string;
 }
+
+
+export type GetUsersResponse = {
+  success: boolean;
+  total: number;
+  page: number;
+  pageSize: number;
+  items: User[];
+};
+
 
 // ---------- App-wide Leave model ----------
 export type LeaveStatus =
@@ -42,7 +55,14 @@ export interface LeaveRequest {
   rejectionReason?: string;
   
 }
-
+export type Department = {
+  id: number;
+  name: string;
+  managerId: number | null;
+  usersCount: number;
+  userNames: string[] | null;
+  managerName: string | null;
+};
 export type Status = 'pending' | 'managerApproved' | 'hrApproved' | 'rejected';
 
 export type Counts = Record<Status, number>;
@@ -129,3 +149,21 @@ export interface ApiError {
   message: string;
   details?: string[];
 }
+
+// export type ManagerApprovedItem = {
+//   id: number;
+//   userId: number;
+//   userName: string;
+//   managerName?: string;
+//   fromDate: string; // ISO
+//   toDate: string;   // ISO
+//   leaveType: string;
+//   reason: string;
+//   status: 'ManagerApproved' | string;
+//   createdAt: string;
+// };
+
+export type HRPendingResponse = {
+  count: number;
+  leaveRequests: ManagerApprovedItem[];
+};

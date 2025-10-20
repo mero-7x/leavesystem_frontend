@@ -11,6 +11,7 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { apiService } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 // Safely parse "YYYY-MM-DD HH:mm:ss" or ISO strings
 function parseApiDate(input: string) {
@@ -44,12 +45,17 @@ const statusOptions: Array<{ value: FilterValue; label: string }> = [
 ];
 
 const MyRequests: React.FC = () => {
+  const { user } = useAuth();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterValue>('all');
 
   useEffect(() => {
+        if (!user) return;
+
+    if (user?.role !== "EMPLOYEE") return;
     (async () => {
+      
       try {
         const data = await apiService.getMyLeaveRequests();
         setRequests(data);

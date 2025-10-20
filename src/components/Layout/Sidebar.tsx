@@ -81,12 +81,13 @@ const Sidebar: React.FC = () => {
         return [
           ...baseItems,
           // { to: '/new-request', icon: Calendar, label: 'New Request' },
+    
           { to: '/pending-approvals', icon: Clock, label: 'Team Approvals' },
           { to: '/history', icon: FileText, label: 'Approval History' }
         ];
       case "HR":
         return [
-          ...baseItems,
+                { to: '/HRDashboard', icon: Calendar, label: ' HR Dashboard' },
           // { to: '/new-request', icon: Calendar, label: 'New Request' },
           { to: '/hr-approvals', icon: CheckCircle, label: 'Final Approvals' },
           { to: '/history', icon: FileText, label: 'Approval History' },
